@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Diagnóstico - GeneLab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+       /* RESET BÁSICO E PROTEÇÃO DE TOQUE */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Montserrat', sans-serif; 
+    -webkit-tap-highlight-color: transparent; 
+}
+
+/* TRAVA DE SELEÇÃO DE TEXTO NO BODY */
+body { 
+    -webkit-user-select: none; 
+    -moz-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none; 
+    background-color: #EEF2F6; color: #1A2B4C; min-height: 100vh; display: flex; flex-direction: column;
+}
+
+/* LIBERAÇÃO PARA CAIXAS DE DIGITAÇÃO */
+input, select, textarea {
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
+}
+        
+        .lab-navbar { background-color: #0A2540; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; color: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-voltar { color: #20B2AA; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; cursor: pointer;}
+        .btn-voltar:hover { color: #FFFFFF; }
+        .lab-logo { font-size: 1.5rem; font-weight: 800; }
+        .lab-logo span { color: #20B2AA; }
+
+        /* UTILITÁRIOS */
+        .escondido { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* LAYOUT PRINCIPAL */
+        .container-app { padding: 40px 5%; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; gap: 30px; align-items: flex-start; }
+        
+        .painel-principal { flex: 2; background: #FFFFFF; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); min-height: 800px; position: relative; }
+        
+        .tela-inicial { text-align: center; margin-top: 100px; color: #5A6B80; }
+        .tela-inicial h1 { color: #0A2540; font-size: 2.5rem; margin-bottom: 20px; }
+        .tela-inicial p { font-size: 1.1rem; line-height: 1.6; max-width: 600px; margin: 0 auto; }
+        .icone-lupa { font-size: 5rem; margin-bottom: 20px; opacity: 0.5; }
+
+        .prontuario-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #EEF2F6; padding-bottom: 20px; margin-bottom: 30px; }
+        .prontuario-header-left h2 { color: #0A2540; font-size: 1.8rem; margin-bottom: 8px; }
+        .prontuario-header-left span { background: #E0F2F1; color: #20B2AA; padding: 5px 15px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; }
+        .prontuario-header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+        
+        /* BOTÃO DA ENCICLOPÉDIA MÉDICA */
+        .btn-doenca-info { background: #FFF9E6; color: #B7950B; border: 1px solid #F1C40F; padding: 10px 15px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-size: 0.9rem; }
+        .btn-doenca-info:hover { background: #F1C40F; color: #0A2540; }
+
+        .box-info { padding: 25px; border-radius: 12px; margin-bottom: 20px; line-height: 1.7; font-size: 1.05rem; }
+        .box-info h4 { margin-bottom: 12px; font-size: 1.15rem; display: flex; align-items: center; gap: 8px; }
+        .box-historico { background-color: #F4F7F9; border-left: 5px solid #0A2540; color: #1A2B4C; }
+        .box-historico h4 { color: #0A2540; }
+        .box-exames { background-color: #F0F4F8; border-left: 5px solid #20B2AA; color: #2C3E50; }
+        .box-exames h4 { color: #189A93; }
+
+        .ferramentas-area { margin-top: 40px; }
+        .ferramentas-area h3 { color: #0A2540; margin-bottom: 5px; }
+        .ferramentas-area p { color: #79859C; font-size: 0.9rem; margin-bottom: 10px; line-height: 1.6; }
+        .dica-alelo { background: #E0F2F1; color: #189A93; padding: 10px 15px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; display: block; margin-bottom: 20px; border-left: 4px solid #20B2AA;}
+        
+        .punnett-wrapper { display: grid; grid-template-columns: 80px 100px 100px; grid-template-rows: 60px 80px 80px; gap: 8px; justify-content: center; margin-bottom: 40px; }
+        .punnett-cell { display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 2px solid #E0E5EC; overflow: hidden; background: white; }
+        .punnett-empty { border: none; background: transparent; }
+        .punnett-header { background: #0A2540; border-color: #0A2540; }
+        
+        .punnett-input { width: 100%; height: 100%; border: none; text-align: center; font-size: 1.3rem; font-weight: 700; outline: none; transition: 0.2s; }
+        .punnett-header .punnett-input { background: #0A2540; color: white; }
+        .punnett-header .punnett-input:focus { background: #133a61; }
+        .punnett-cell:not(.punnett-header) .punnett-input { color: #1A2B4C; }
+        .punnett-cell:not(.punnett-header) .punnett-input:focus { background: #E0F2F1; }
+
+        .laudo-box { background: #F8F9FA; padding: 30px; border-radius: 16px; border: 2px dashed #CBD5E1; }
+        .laudo-box h4 { color: #0A2540; margin-bottom: 20px; font-size: 1.2rem; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; color: #5A6B80; margin-bottom: 8px; font-size: 0.95rem; }
+        .form-select { width: 100%; padding: 15px; border: 2px solid #E0E5EC; border-radius: 8px; font-size: 1rem; color: #1A2B4C; outline: none; background: white; cursor: pointer; }
+        .form-select:focus { border-color: #20B2AA; }
+        
+        .btn-laudo { width: 100%; padding: 18px; background: #20B2AA; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-laudo:hover { background: #189A93; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(32, 178, 170, 0.3); }
+
+        .feedback-box { margin-top: 25px; padding: 25px; border-radius: 12px; font-size: 1rem; line-height: 1.7; }
+        .feedback-box.sucesso { background: #E8F8F5; border-left: 5px solid #2ECC71; color: #117864; }
+        .feedback-box.erro { background: #FDEDEC; border-left: 5px solid #E74C3C; color: #922B21; }
+        .feedback-box h5 { margin-top: 15px; margin-bottom: 5px; color: currentColor; font-size: 1.1rem; }
+
+        .sidebar { flex: 1; position: sticky; top: 100px; }
+        
+        .btn-aleatorio { width: 100%; padding: 20px; background: #0A2540; color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 25px; box-shadow: 0 10px 20px rgba(10, 37, 64, 0.15); }
+        .btn-aleatorio:hover { background: #133a61; transform: translateY(-3px); }
+
+        .lista-titulo { font-size: 1.2rem; color: #0A2540; margin-bottom: 15px; font-weight: 700; }
+        .casos-lista { display: flex; flex-direction: column; gap: 12px; max-height: 650px; overflow-y: auto; padding-right: 5px; }
+        
+        .casos-lista::-webkit-scrollbar { width: 6px; }
+        .casos-lista::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+
+        .card-caso { background: white; padding: 15px 20px; border-radius: 10px; border: 1px solid #E0E5EC; border-left: 4px solid #CBD5E1; cursor: pointer; transition: 0.2s; }
+        .card-caso:hover { transform: translateX(5px); border-left-color: #20B2AA; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .card-caso.ativo { border-left-color: #20B2AA; background: #F4F7F9; }
+        .card-caso h5 { color: #0A2540; font-size: 1rem; margin-bottom: 5px; }
+        .card-caso p { color: #79859C; font-size: 0.8rem; }
+
+        /* MODAL DA ENCICLOPÉDIA MÉDICA */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,37,64,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(5px); }
+        .modal-overlay.ativo { opacity: 1; pointer-events: auto; }
+        .modal-content { background: white; padding: 40px; border-radius: 16px; max-width: 800px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; transform: translateY(20px); transition: 0.3s; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+        .modal-overlay.ativo .modal-content { transform: translateY(0); }
+        .btn-fechar-modal { position: absolute; top: 20px; right: 25px; background: #F4F7F9; border: none; font-size: 1.5rem; cursor: pointer; color: #0A2540; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-fechar-modal:hover { background: #E74C3C; color: white; }
+        .modal-content h3 { color: #0A2540; font-size: 2rem; margin-bottom: 10px; border-bottom: 2px solid #20B2AA; padding-bottom: 10px; display: inline-block;}
+        .modal-body { margin-top: 20px; color: #4A4A4A; font-size: 1.1rem; line-height: 1.8; }
+        .modal-body strong { color: #189A93; }
+
+        @media (max-width: 950px) {
+            .container-app { flex-direction: column; }
+            .sidebar { position: relative; top: 0; width: 100%; order: -1; }
+            .painel-principal { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="lab-navbar">
+        <div class="btn-voltar" onclick="window.location.href='mendel.html'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Voltar para a Teoria</span>
+        </div>
+        <div class="lab-logo">Gene<span>Lab</span></div>
+    </nav>
+
+    <div class="container-app">
+        
+        <main class="painel-principal">
+            
+            <div id="tela-inicial" class="tela-inicial fade-in">
+                <div class="icone-lupa">🔍</div>
+                <h1>Prontuários Eletrônicos</h1>
+                <p>Laboratório de Triagem Genética. Selecione um prontuário na lista lateral para analisar a Anamnese e os Exames Laboratoriais. O laudo clínico final é de sua responsabilidade.</p>
+            </div>
+
+            <div id="tela-caso" class="escondido fade-in">
+                
+                <div class="prontuario-header">
+                    <div class="prontuario-header-left">
+                        <h2 id="paciente-nome">Paciente XYZ</h2>
+                        <span id="paciente-id">ID: 0000</span>
+                        <span id="paciente-especialidade" style="background: #E8F8F5; color: #117864; margin-left: 10px;">Especialidade</span>
+                    </div>
+                    <div class="prontuario-header-right">
+                        <button class="btn-doenca-info" onclick="abrirModalDoenca()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            Enciclopédia Médica
+                        </button>
+                    </div>
+                </div>
+
+                <div class="box-info box-historico">
+                    <h4>📋 Anamnese e Evolução Clínica</h4>
+                    <p id="texto-historico">...</p>
+                </div>
+
+                <div class="box-info box-exames">
+                    <h4>🧪 Parecer do Laboratório / Heredograma</h4>
+                    <p id="texto-exame">...</p>
+                </div>
+
+                <div class="ferramentas-area">
+                    <h3>Quadro de Punnett (Rascunho Livre)</h3>
+                    <p>Utilize esta área para deduzir os genótipos. As células cinzas representam os gametas isolados na meiose.</p>
+                    
+                    <div class="dica-alelo">
+                        <strong>Bordas (Gametas Isolados):</strong> A, a, XA, Xa, X, Y, Ym, IA, IB, i <br>
+                        <strong>Centro (Fecundação / Filhos):</strong> AA, Aa, aa, XAXA, XAXa, XaY, XYm, XX, IAIB, IAi, ii
+                    </div>
+                    
+                    <div class="punnett-wrapper">
+                        <div class="punnett-cell punnett-empty"></div>
+                        <!-- BORDAS: Limite de 2 caracteres -->
+                        <div class="punnett-cell punnett-header"><input type="text" class="punnett-input" maxlength="2"></div>
+                        <div class="punnett-cell punnett-header"><input type="text" class="punnett-input" maxlength="2"></div>
+                        
+                        <!-- LINHA 1 -->
+                        <div class="punnett-cell punnett-header"><input type="text" class="punnett-input" maxlength="2"></div>
+                        <!-- CENTRO: Limite de 4 caracteres -->
+                        <div class="punnett-cell"><input type="text" class="punnett-input" maxlength="4"></div>
+                        <div class="punnett-cell"><input type="text" class="punnett-input" maxlength="4"></div>
+
+                        <!-- LINHA 2 -->
+                        <div class="punnett-cell punnett-header"><input type="text" class="punnett-input" maxlength="2"></div>
+                        <div class="punnett-cell"><input type="text" class="punnett-input" maxlength="4"></div>
+                        <div class="punnett-cell"><input type="text" class="punnett-input" maxlength="4"></div>
+                    </div>
+                </div>
+
+                <div class="laudo-box">
+                    <h4>Emissão do Laudo Genético</h4>
+                    
+                    <div class="form-group">
+                        <label>1. Padrão de Herança identificado a partir da análise:</label>
+                        <select id="select-heranca" class="form-select">
+                            <option value="">Selecione o padrão de herança...</option>
+                            <option value="autossomica-recessiva">Herança Autossômica Recessiva</option>
+                            <option value="autossomica-dominante">Herança Autossômica Dominante</option>
+                            <option value="ligada-x-recessiva">Herança Ligada ao X (Recessiva)</option>
+                            <option value="ligada-x-dominante">Herança Ligada ao X (Dominante)</option>
+                            <option value="ligada-y">Herança Ligada ao Y (Holândrica)</option>
+                            <option value="dominancia-incompleta">Dominância Incompleta (Ausência de Dominância)</option>
+                            <option value="codominancia">Codominância</option>
+                            <option value="alelos-multiplos">Alelos Múltiplos (Polialelia)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2. Risco ou Probabilidade Genética do evento questionado no caso:</label>
+                        <select id="select-prob" class="form-select">
+                            <option value="">Selecione a probabilidade matemática...</option>
+                            <option value="0">0%</option>
+                            <option value="25">25% (1/4)</option>
+                            <option value="50">50% (1/2)</option>
+                            <option value="75">75% (3/4)</option>
+                            <option value="100">100% (4/4)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-laudo" onclick="validarLaudo()">Assinar e Finalizar Laudo</button>
+
+                    <div id="feedback-laudo" class="feedback-box escondido"></div>
+                </div>
+
+            </div>
+        </main>
+
+        <aside class="sidebar">
+            <button class="btn-aleatorio" onclick="carregarCasoAleatorio()">
+                🎲 Investigar Caso Aleatório
+            </button>
+            
+            <h3 class="lista-titulo">Prontuários Abertos</h3>
+            <div class="casos-lista" id="lista-casos-container">
+                <!-- Preenchido via JS -->
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- ESTRUTURA DO MODAL DA ENCICLOPÉDIA MÉDICA -->
+    <div id="modal-doenca" class="modal-overlay">
+        <div class="modal-content">
+            <button class="btn-fechar-modal" onclick="fecharModalDoenca()">×</button>
+            <h3 id="modal-titulo-doenca">Nome da Doença</h3>
+            <div id="modal-corpo-doenca" class="modal-body">
+                <!-- Conteúdo gerado via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BANCO DE DADOS: 24 CASOS CLÍNICOS FOCADOS EM 8 PADRÕES DE HERANÇA
+        const bancoDeCasos = [
+            // --- 1. AUTOSSÔMICA RECESSIVA ---
+            {
+                paciente: "Paciente R.N.", especialidade: "Pneumologia",
+                historico: "Carlos e Ana são saudáveis. Eles procuram a clínica porque o filho recém-nascido tem infecções pulmonares e a pele tem um gosto excessivamente salgado. Qual a chance geral de um próximo filho ter a doença?",
+                exames: "A condição afeta homens e mulheres da família com a mesma frequência e pula gerações (pais normais com filho afetado).",
+                respostaHeranca: "autossomica-recessiva", respostaProbabilidade: "25",
+                explicacao: "A condição 'pula gerações' e afeta ambos os sexos, logo é Autossômica Recessiva. Pais normais com filho afetado são obrigatoriamente heterozigotos (Aa). O cruzamento Aa x Aa gera 25% de chance de um filho 'aa'.",
+                doenca: "Fibrose Cística",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> A Fibrose Cística é causada por mutações no gene CFTR. Esse gene codifica um canal de cloreto nas células. A ausência desse canal torna o muco corporal extremamente espesso, bloqueando os pulmões e o pâncreas, além de deixar o suor muito salgado."
+            },
+            {
+                paciente: "Paciente J.S.", especialidade: "Neuropediatria",
+                historico: "Joana (saudável) e Marcos (afetado) acabaram de ter um bebê. O Teste do Pezinho deu positivo para a doença. Joana descobriu ser portadora silenciosa. Qual a chance do próximo bebê nascer com a doença?",
+                exames: "Na árvore genealógica, a condição aparece subitamente em filhos de pais normais, afetando igualmente meninos e meninas.",
+                respostaHeranca: "autossomica-recessiva", respostaProbabilidade: "50",
+                explicacao: "Como a condição afeta igualmente os sexos e surge de pais normais, é Autossômica Recessiva. O pai é afetado (aa) e a mãe é portadora (Aa). O cruzamento Aa x aa gera 50% de chance de filhos afetados (aa).",
+                doenca: "Fenilcetonúria (PKU)",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> A PKU impede a metabolização do aminoácido fenilalanina, que se torna tóxico ao cérebro em desenvolvimento. Isso causa deficiência intelectual e convulsões se a criança não tiver uma dieta rigorosamente controlada desde o nascimento."
+            },
+            {
+                paciente: "Paciente A.K.", especialidade: "Dermatologia",
+                historico: "Um menino apresenta ausência total de pigmentação na pele, fotofobia e nistagmo ocular. Seus pais e seu irmão mais velho possuem pigmentação normal. Qual a chance de os pais terem outra criança com o mesmo quadro?",
+                exames: "O heredograma da família não mostra outros afetados nas gerações recentes, evidenciando uma condição que precisa estar em dose dupla para se manifestar.",
+                respostaHeranca: "autossomica-recessiva", respostaProbabilidade: "25",
+                explicacao: "A doença precisa estar em dose dupla para anular o pigmento normal (Autossômica Recessiva). Os pais são Aa. A chance de terem outro filho (aa) na próxima gravidez é de 25%.",
+                doenca: "Albinismo Oculocutâneo",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Caracterizado por mutações no gene TYR, responsável por produzir a enzima Tirosinase. Sem ela, o corpo não consegue converter a tirosina em melanina, afetando a pele, cabelos e o desenvolvimento correto da retina."
+            },
+
+            // --- 2. AUTOSSÔMICA DOMINANTE ---
+            {
+                paciente: "Paciente R.M.", especialidade: "Neurologia Clínica",
+                historico: "Ricardo (heterozigoto) foi diagnosticado com declínio cognitivo e perda motora. Sua esposa é saudável. Qual a chance de seus futuros filhos desenvolverem a doença na fase adulta?",
+                exames: "O heredograma de Ricardo mostra que a condição está presente em TODAS as gerações (pai, avó, bisavô), afetando ambos os sexos indiscriminadamente.",
+                respostaHeranca: "autossomica-dominante", respostaProbabilidade: "50",
+                explicacao: "A presença em todas as gerações denuncia a herança Autossômica Dominante. Ricardo é Aa e a esposa aa. O cruzamento Aa x aa gera 50% de chance de herdar o alelo dominante (A).",
+                doenca: "Doença de Huntington",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> A Doença de Huntington cria uma proteína tóxica (huntingtina mutante) que destrói progressivamente os neurônios do gânglio basal na idade adulta, causando movimentos involuntários severos."
+            },
+            {
+                paciente: "Paciente C.L.", especialidade: "Dermatologia",
+                historico: "Uma paciente de 25 anos apresenta nódulos cutâneos e manchas. Sua mãe possui o mesmo quadro. Ela é heterozigota e casou-se com um homem normal. Risco da filha nascer afetada?",
+                exames: "O traço nunca pula gerações. Basta um dos pais ter a condição para que os filhos apresentem os mesmos tumores benignos.",
+                respostaHeranca: "autossomica-dominante", respostaProbabilidade: "50",
+                explicacao: "Como não pula gerações, é Autossômica Dominante. A paciente é Aa e o marido aa. Basta herdar um alelo mutado dominante 'A' para manifestar a doença (50% de chance).",
+                doenca: "Neurofibromatose Tipo 1",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Causada por mutação no gene NF1. A falta da proteína neurofibromina funcional faz com que células neurais se multipliquem de forma desordenada, criando tumores benignos nos nervos periféricos (neurofibromas)."
+            },
+            {
+                paciente: "Casal G.H.", especialidade: "Endocrinologia Pediátrica",
+                historico: "Casal afetado (Ambos Aa) cruzam. Qual a chance teórica total da concepção gerar o alelo dominante (incluindo a forma homozigota letal na contagem)?",
+                exames: "Uma única cópia mutante altera o crescimento ósseo. Apenas a dose dupla recessiva (aa) permite o crescimento normal sem o traço limitador.",
+                respostaHeranca: "autossomica-dominante", respostaProbabilidade: "75",
+                explicacao: "Herança Autossômica Dominante. No cruzamento (Aa x Aa), a matriz gera 25% AA, 50% Aa e 25% aa. Somando-se as genéticas portadoras do alelo dominante (25% + 50%), o risco total é de 75%.",
+                doenca: "Acondroplasia",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Mutação no gene FGFR3. Este receptor age como um 'freio' no crescimento dos ossos. A mutação o deixa permanentemente ligado, inibindo severamente a proliferação das cartilagens de crescimento."
+            },
+
+            // --- 3. LIGADA AO X RECESSIVA ---
+            {
+                paciente: "Paciente R.B.", especialidade: "Aconselhamento Genético",
+                historico: "Roberto possui sangramentos severos e crônicos. Sua esposa, Clara, é saudável e não é portadora do gene. Qual a chance de o casal ter uma filha que apresente os sintomas graves da doença?",
+                exames: "Na família de Roberto, apenas os homens apresentam a condição clinicamente. As mulheres são sempre apenas portadoras assintomáticas.",
+                respostaHeranca: "ligada-x-recessiva", respostaProbabilidade: "0",
+                explicacao: "A doença afeta quase que exclusivamente homens (Ligada ao X Recessiva). Roberto (XaY) passará o Xa mutado para as filhas (que serão apenas portadoras XAXa). A chance de uma filha manifestar a doença clinicamente é 0%.",
+                doenca: "Hemofilia A",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> A mutação no cromossomo X afeta a produção do Fator VIII da coagulação. Sem essa proteína, o corpo não consegue formar um coágulo estável, causando hemorragias graves em articulações e músculos."
+            },
+            {
+                paciente: "Paciente L.M.", especialidade: "Neuromuscular",
+                historico: "Uma mãe descobre ser portadora silenciosa de uma mutação severa nos músculos, enquanto o pai é saudável. Qual a chance geral de o próximo filho (de qualquer sexo) manifestar a doença?",
+                exames: "A condição leva à perda muscular severa na infância, afetando apenas os meninos da árvore genealógica.",
+                respostaHeranca: "ligada-x-recessiva", respostaProbabilidade: "25",
+                explicacao: "Herança Ligada ao X Recessiva. Mãe portadora (XDXd) e pai normal (XDY). As chances são: 25% filha sã, 25% filha portadora, 25% filho são, e 25% filho afetado (XdY). O risco geral é 25%.",
+                doenca: "Distrofia Muscular de Duchenne",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Causada por mutações no gene DMD, que produz a distrofina. Sem ela, a tensão mecânica rompe a membrana muscular constantemente, causando necrose celular e substituição do músculo por gordura."
+            },
+            {
+                paciente: "Paciente L.T.", especialidade: "Oftalmologia",
+                historico: "O avô materno de Lucas tinha dificuldade em ver as cores verde e vermelho. A mãe de Lucas tem visão normal, mas Lucas herdou o distúrbio. Se Lucas tiver filhos com uma mulher normal, qual a chance de os filhos homens serem daltônicos?",
+                exames: "A mutação está no cromossomo sexual. A passagem ocorre do avô, para a mãe (portadora), para o filho homem.",
+                respostaHeranca: "ligada-x-recessiva", respostaProbabilidade: "0",
+                explicacao: "Daltonismo é Ligado ao X Recessivo. Lucas (XdY) passará seu Y para TODOS os seus filhos homens. Como a esposa é normal (XDXD), 100% dos meninos receberão o X saudável da mãe (0% de chance de serem daltônicos).",
+                doenca: "Daltonismo",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> O defeito reside nas moléculas de opsina visual presentes nos fotorreceptores da retina. Mutações fazem o paciente perder a capacidade neurológica de diferenciar comprimentos de onda na faixa vermelho-verde."
+            },
+
+            // --- 4. LIGADA AO X DOMINANTE ---
+            {
+                paciente: "Paciente V.I.", especialidade: "Ortopedia",
+                historico: "Paciente masculino apresenta arqueamento severo das pernas. Ele tem a condição porque herdou a mutação, mas sua esposa é normal. Qual a chance de ele transmitir a doença para suas filhas mulheres?",
+                exames: "A regra de ouro da família dele: O paciente passou a doença para ABSOLUTAMENTE TODAS as suas filhas, mas para NENHUM de seus filhos homens.",
+                respostaHeranca: "ligada-x-dominante", respostaProbabilidade: "100",
+                explicacao: "O fato de o pai transmitir para 100% das filhas e 0% dos filhos decreta a Herança Ligada ao X Dominante. Como as filhas sempre herdam o único X do pai (que está mutado e é dominante), a chance é 100%.",
+                doenca: "Raquitismo Hipofosfatêmico",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> A desordem causa perda excessiva de fosfato pelos rins, impedindo que os ossos se calcifiquem corretamente. O esqueleto não se mineraliza e curva sob o peso do próprio corpo, resistindo à vitamina D."
+            },
+            {
+                paciente: "Paciente C.H.", especialidade: "Neuropediatria",
+                historico: "Uma mãe portadora tem uma síndrome que causa regressão repentina de habilidades motoras. O pai é saudável. Qual a chance de um filho ou filha nascer com a mutação genética?",
+                exames: "A mutação ocorre no cromossomo sexual e se manifesta independentemente de haver um alelo saudável junto.",
+                respostaHeranca: "ligada-x-dominante", respostaProbabilidade: "50",
+                explicacao: "Herança Ligada ao X Dominante. A mãe heterozigota (XDXd) e pai (XdY). Como a mãe tem um X mutado e um saudável, a chance estatística de ela enviar o cromossomo X afetado é de 50%.",
+                doenca: "Síndrome de Rett",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> A mutação afeta a proteína MECP2 no cérebro. A criança tem desenvolvimento normal nos primeiros meses, mas sofre regressão autística profunda, microcefalia e perda do uso das mãos. Geralmente letal em fetos masculinos."
+            },
+            {
+                paciente: "Paciente I.P.", especialidade: "Dermatologia Pediátrica",
+                historico: "Menina recém-nascida exibe placas e lesões na pele com pigmentação cinza em redemoinhos. A mãe tem falhas capilares sutis (ela possui a condição). É letal em fetos masculinos. Risco de repetição do gene mutado na próxima gravidez?",
+                exames: "Uma única cópia mutante no cromossomo X da mãe causa os sintomas dominantes nas áreas onde a célula está ativa.",
+                respostaHeranca: "ligada-x-dominante", respostaProbabilidade: "50",
+                explicacao: "Herança Ligada ao X Dominante com letalidade masculina. A mãe (XDXd) transmite seu cromossomo dominante XD com 50% de probabilidade matemática em qualquer gestação.",
+                doenca: "Incontinência Pigmentar",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Ocorre por falha na proteína de proteção celular NEMO. Células da pele morrem gerando bolhas e anomalias. No homem XY, a ausência de células normais de resgate leva ao aborto na gravidez precoce."
+            },
+
+            // --- 5. LIGADA AO Y (HOLÂNDRICA) ---
+            {
+                paciente: "Paciente M.O.", especialidade: "Reprodução Humana",
+                historico: "Um paciente tem infertilidade severa (azoospermia) devido a uma mutação no cromossomo masculino. Ele fará Fertilização In Vitro. Qual a chance de transmitir o gene da doença para uma FILHA?",
+                exames: "A mutação está localizada em uma região do cromossomo Y (fator AZF).",
+                respostaHeranca: "ligada-y", respostaProbabilidade: "0",
+                explicacao: "Herança Holândrica (Ligada ao Y). Meninas (XX) recebem apenas o cromossomo X do pai. Logo, a chance de uma filha herdar o cromossomo Y mutado é matematicamente 0%.",
+                doenca: "Microdeleção do Cromossomo Y",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Mutações no Fator de Azoospermia (AZF) geram falhas críticas na produção e maturação dos espermatozoides, causando infertilidade grave. Mulheres são 100% livres dessa característica."
+            },
+            {
+                paciente: "Paciente E.S.", especialidade: "Genética",
+                historico: "Uma mutação familiar no gene SRY foi identificada em um paciente. Sabendo que sua esposa é saudável (XX), qual a chance da criança herdar o gene afetado se o recém-nascido for MENINO?",
+                exames: "O gene afetado é responsável pela formação testicular primária durante a fase embrionária, e nunca afeta filhas.",
+                respostaHeranca: "ligada-y", respostaProbabilidade: "100",
+                explicacao: "Herança Ligada ao Y. Como o gene SRY fica no Y, o pai obrigatoriamente passará esse cromossomo para todos os filhos de sexo biológico masculino, representando 100% de chance para eles.",
+                doenca: "Mutação no Gene SRY",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> O SRY atua como o interruptor mestre que transforma as gônadas primitivas em testículos no embrião. Falhas ou mutações ativas neste gene são repassadas em linha direta masculina, sem exceção."
+            },
+            {
+                paciente: "Paciente L.Y.", especialidade: "Otorrinolaringologia",
+                historico: "Paciente adulto desenvolveu surdez congênita progressiva. A árvore genealógica de 4 gerações revela que dezenas de homens da família ficaram surdos após os 40 anos, sem nenhuma mulher afetada. Risco para o próximo filho biológico homem (XY)?",
+                exames: "O padrão restrito e contínuo ao sexo masculino demonstra uma via inquebrável de pai para filho.",
+                respostaHeranca: "ligada-y", respostaProbabilidade: "100",
+                explicacao: "A linhagem demonstra herança estrita Holândrica (Ligada ao Y). O pai transmitirá obrigatoriamente o seu cromossomo Y mutante para 100% de seus filhos que nascerem XY.",
+                doenca: "Surdez Ligada ao Y",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Uma mutação extremamente rara e pontual no cromossomo Y (Locus DFNY1) que provoca a morte progressiva das células ciliadas da audição nos homens de maneira pós-lingual. Mulheres jamais serão portadoras."
+            },
+
+            // --- 6. DOMINÂNCIA INCOMPLETA ---
+            {
+                paciente: "Casal J. e M.", especialidade: "Cardiologia Clínica",
+                historico: "Dois pacientes têm a forma 'leve' da doença e precisam fazer controle com estatinas. Eles se casam. Qual a chance de terem um filho com a forma SEVERA da doença (risco de infarto antes dos 10 anos)?",
+                exames: "Nesta doença, heterozigotos têm o colesterol em 300mg/dL. Homozigotos têm acima de 800mg/dL e ausência total de depuração.",
+                respostaHeranca: "dominancia-incompleta", respostaProbabilidade: "25",
+                explicacao: "O paciente Aa manifesta um quadro clínico nitidamente intermediário. Isso atesta uma Dominância Incompleta. Cruzar dois portadores da forma leve (Aa x Aa) gera 25% de chance da criança herdar o fenótipo severo recessivo duplo (aa).",
+                doenca: "Hipercolesterolemia Familiar",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Causada por defeitos nos receptores de LDL no fígado. Indivíduos heterozigotos têm apenas 50% dos receptores (forma leve). Homozigotos têm 0% de receptores (forma letal severa)."
+            },
+            {
+                paciente: "Casal T. e S.", especialidade: "Hematologia",
+                historico: "Uma mulher com diagnóstico de Traço Talassêmico leve casa-se com um homem também portador do mesmo traço brando sem intercorrências clínicas graves.",
+                exames: "Os dois possuem uma HbA normal e uma Hb com falhas. Qual a chance de gerarem um bebê com a forma Major (letal ou dependente vital de transfusões)?",
+                respostaHeranca: "dominancia-incompleta", respostaProbabilidade: "25",
+                explicacao: "Em nível clínico, essa anemia apresenta Dominância Incompleta, com estados fenotípicos graduais distintos baseados na quantidade de cadeias eficientes. O cruzamento Aa x Aa resulta em 25% de herdar a doença severa 'aa'.",
+                doenca: "Beta-Talassemia",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Mutação que inibe a produção da cadeia Beta da hemoglobina. O heterozigoto tem o traço leve. O homozigoto (Síndrome de Cooley) tem parada completa, causando hemácias defeituosas e hemólise intensa."
+            },
+            {
+                paciente: "Casal A. e B.", especialidade: "Bioquímica Clínica",
+                historico: "Dois pais são clínica e fenotipicamente normais. Porém, o laboratório atesta que ambos produzem exatamente 50% de uma enzima neural. Qual a chance do filho nascer com 0% da atividade enzimática (doença mortal)?",
+                exames: "A dosagem enzimática mostra três fenótipos distintos na população: 100% de enzima, 50% de enzima, e 0% de enzima.",
+                respostaHeranca: "dominancia-incompleta", respostaProbabilidade: "25",
+                explicacao: "Bioquimicamente, a enzima expressa Dominância Incompleta (o portador gera metade da capacidade padrão). Aa x Aa gera 25% de chance para os filhos produzirem 0% da enzima (aa).",
+                doenca: "Doença de Tay-Sachs",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Interrupção da produção da enzima HEX-A, que recicla estruturas graxas dentro das células nervosas. Sem a enzima (homozigotos), a gordura acumula no cérebro causando devastação neuromotora global precoce."
+            },
+
+            // --- 7. CODOMINÂNCIA ---
+            {
+                paciente: "Casal U. e A.", especialidade: "Imunohematologia",
+                historico: "Uma mulher e um homem têm o sangue Tipo MN (expressam antígenos M e N na hemácia simultaneamente). Qual a chance de o filho deles também ter sangue Tipo MN?",
+                exames: "No sangue MN, o alelo M e o alelo N não se misturam como tintas. A hemácia exibe ambos os antígenos visíveis de forma independente.",
+                respostaHeranca: "codominancia", respostaProbabilidade: "50",
+                explicacao: "Ambos os alelos são fortes e se expressam juntos sem se fundir (Codominância). O cruzamento de duplo híbrido MN x MN resulta em 25% MM, 50% MN e 25% NN.",
+                doenca: "Sistema Sanguíneo MN",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Diferente do sistema ABO, o sistema MN não gera anticorpos naturais significativos na vida real, mas é o modelo escolar perfeito da codominância, onde nenhum alelo inibe o outro na membrana celular."
+            },
+            {
+                paciente: "Casal H. e S.", especialidade: "Hematologia Investigativa",
+                historico: "Uma paciente tem Traço Falciforme (possui tanto hemoglobina normal HbA quanto mutada HbS). Seu marido tem hemoglobina totalmente normal (HbAA). Chance de o filho ter o Traço Falciforme (Ser portador)?",
+                exames: "A eletroforese de hemoglobina da mãe detecta a presença igualitária de dois tipos diferentes de proteínas correndo no gel.",
+                respostaHeranca: "codominancia", respostaProbabilidade: "50",
+                explicacao: "Em nível molecular celular, a presença do Traço Falciforme é um caso de Codominância (ambas as hemoglobinas são ativamente produzidas no paciente AS). O cruzamento AS x AA gera 50% de chance de filhos AA e 50% de AS.",
+                doenca: "Traço Falciforme",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> No traço (AS), a célula tem as duas proteínas circulando. A hemácia funciona quase normalmente na oxigenação. Apenas em cruzamentos onde herda os dois genes mutados (SS) a hemácia vira foice sob estresse."
+            },
+            {
+                paciente: "Casal M. e Z.", especialidade: "Pneumologia",
+                historico: "Dois pacientes têm perfil genético 'PiMZ', o que significa que produzem tanto o inibidor pulmonar normal 'M' quanto o mutado 'Z'. Chance de o filho herdar a forma letal 'ZZ' da doença pulmonar?",
+                exames: "Os genes 'M' e 'Z' são perfeitamente iguais na força. O paciente M/Z lança no sangue as duas versões de antígenos simultaneamente.",
+                respostaHeranca: "codominancia", respostaProbabilidade: "25",
+                explicacao: "As fitas polimórficas das enzimas demonstram Herança Codominante (M e Z estão mapeadas juntas laboratorialmente). Pais PiMZ x PiMZ geram descendente homozigótico mutante ZZ em 25% dos casos.",
+                doenca: "Deficiência de Alfa-1 Antitripsina",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> A enzima M protege o pulmão das próprias defesas do corpo. A enzima Z mutada não consegue proteger e fica presa no fígado. Sem a enzima correta circulando (ZZ), os alvéolos pulmonares são destruídos causando enfisema severo."
+            },
+
+            // --- 8. ALELOS MÚLTIPLOS (POLIALELIA) ---
+            {
+                paciente: "Casal A. e B.", especialidade: "Transfusões Sanguíneas",
+                historico: "Mãe com sangue Tipo A e Pai com sangue Tipo B estão grávidos. Ambos têm pais do Tipo O (logo, eles mesmos escondem o alelo 'i'). Qual a chance de o bebê nascer com sangue Tipo O (doador universal)?",
+                exames: "A característica sanguínea é regulada por mais de duas variações do mesmo gene convivendo na humanidade.",
+                respostaHeranca: "alelos-multiplos", respostaProbabilidade: "25",
+                explicacao: "O Sistema ABO tem três alelos (Iᴬ, Iᴮ e i) que se misturam, caracterizando Alelos Múltiplos. Sendo os pais IAi e IBi, o quadro de Punnett resulta em exatos 25% de chance da criança herdar o alelo recessivo duplo 'ii' (Sangue O).",
+                doenca: "Tipagem ABO Genética",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> A herança dos agrupamentos do Sistema Sanguíneo ABO obedece à variação de Alelos Múltiplos, onde a população detém três versões do mesmo gene competindo para fixar antígenos na membrana das hemácias."
+            },
+            {
+                paciente: "Casal P. e X.", especialidade: "Genética Forense",
+                historico: "Um paciente com sangue Tipo AB (genótipo IAIB) casou-se com uma mulher de sangue Tipo O (genótipo ii). Eles querem saber a chance estatística de terem um filho nascendo com Sangue Tipo O.",
+                exames: "Na população há três cópias do gene, mas o indivíduo humano carrega apenas duas em seus cromossomos diploides.",
+                respostaHeranca: "alelos-multiplos", respostaProbabilidade: "0",
+                explicacao: "Polialelia (Alelos Múltiplos). O cruzamento IAIB x ii só pode gerar filhos IAi (Tipo A) ou IBi (Tipo B). O pai AB nunca tem o gene 'i' para doar, logo, a chance de um filho nascer Tipo O (ii) é de 0%.",
+                doenca: "Investigação Forense ABO",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> Como o indivíduo diploide carrega apenas dois alelos do pool genético mundial, um pai AB obrigatoriamente doará a força do antígeno A ou do antígeno B, suplantando e mascarando o gene recessivo 'i' vindo da mãe O."
+            },
+            {
+                paciente: "Casal B. e N.", especialidade: "Obstetrícia",
+                historico: "Gestante de sangue O (ii) deseja engravidar de um parceiro clinicamente heterozigoto Tipo A (IAi). Qual o risco/chance exato de a criança herdar a proteína A e nascer do Tipo A no cruzamento?",
+                exames: "O pool de genes ABO atua em cruzamentos interativos onde as dominâncias clássicas superam o traço amórfico recessivo nulo.",
+                respostaHeranca: "alelos-multiplos", respostaProbabilidade: "50",
+                explicacao: "Alelos Múltiplos. A união de um parceiro heterozigoto (IAi) com a mãe homozigota nula (ii) funciona como um cruzamento teste mendeliano de 50%. Há 50% de nascer IAi (Tipo A) e 50% de nascer ii (Tipo O).",
+                doenca: "Rotas Sanguíneas",
+                detalhesDoenca: "<strong>Mecanismo Biológico:</strong> O gene Iᴬ codifica uma enzima que fixa proteínas ativas A. Como a mãe O doa apenas alelos silenciosos 'i', toda a responsabilidade de manifestar uma proteína recai na probabilidade isolada do pai enviar ou não seu alelo ativo dominante."
+            }
+        ];
+
+        // FUNÇÃO DE EMBARALHAMENTO (FISHER-YATES)
+        // Isso roda assim que o script é lido, misturando a lista antes de aparecer na tela!
+        function embaralharArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        // Embaralha o banco de dados original imediatamente
+        embaralharArray(bancoDeCasos);
+
+        let casoAtual = null;
+        let casosSorteados = []; // Memória dos casos do botão aleatório
+
+        function renderizarListaDeCasos() {
+            const container = document.getElementById('lista-casos-container');
+            container.innerHTML = '';
+
+            bancoDeCasos.forEach((caso, index) => {
+                // Cria um número de ID falso apenas visual (ex: 001, 002) para ficar em ordem
+                const idFormatado = String(index + 1).padStart(3, '0');
+                
+                const card = document.createElement('div');
+                card.className = 'card-caso';
+                card.id = `card-${index}`;
+                card.innerHTML = `
+                    <h5>${caso.paciente}</h5>
+                    <p>Prontuário #${idFormatado} • ${caso.especialidade}</p>
+                `;
+                card.onclick = () => carregarCaso(index);
+                container.appendChild(card);
+            });
+        }
+
+        function carregarCasoAleatorio() {
+            // Se já sorteou todos os 24 casos, zera a memória para começar de novo
+            if (casosSorteados.length === bancoDeCasos.length) {
+                casosSorteados = []; 
+            }
+            
+            let randomIndex;
+            
+            // Fica sorteando até achar um número que NÃO está na lista de já sorteados
+            // e que seja diferente do caso que está aberto agora
+            do {
+                randomIndex = Math.floor(Math.random() * bancoDeCasos.length);
+            } while (
+                casosSorteados.includes(randomIndex) || 
+                (casoAtual && bancoDeCasos.indexOf(casoAtual) === randomIndex)
+            );
+            
+            // Adiciona o novo caso na memória
+            casosSorteados.push(randomIndex);
+            
+            carregarCaso(randomIndex);
+        }
+
+        function carregarCaso(index) {
+            casoAtual = bancoDeCasos[index];
+            const idFormatado = String(index + 1).padStart(3, '0');
+            
+            document.getElementById('tela-inicial').classList.add('escondido');
+            document.getElementById('tela-caso').classList.remove('escondido');
+            
+            document.querySelectorAll('.card-caso').forEach(c => c.classList.remove('ativo'));
+            document.getElementById(`card-${index}`).classList.add('ativo');
+
+            document.getElementById('paciente-nome').innerText = casoAtual.paciente;
+            document.getElementById('paciente-id').innerText = `ID: #${idFormatado}`;
+            document.getElementById('paciente-especialidade').innerText = casoAtual.especialidade;
+            document.getElementById('texto-historico').innerHTML = casoAtual.historico;
+            document.getElementById('texto-exame').innerHTML = casoAtual.exames;
+            
+            document.querySelectorAll('.punnett-input').forEach(input => input.value = '');
+            document.getElementById('select-heranca').value = '';
+            document.getElementById('select-prob').value = '';
+            
+            const feedback = document.getElementById('feedback-laudo');
+            feedback.classList.add('escondido');
+            feedback.className = 'feedback-box escondido';
+        }
+
+        function validarLaudo() {
+            if (!casoAtual) return;
+            
+            const heranca = document.getElementById('select-heranca').value;
+            const prob = document.getElementById('select-prob').value;
+            const feedback = document.getElementById('feedback-laudo');
+            
+            if (heranca === '' || prob === '') {
+                feedback.innerHTML = `<strong>Atenção:</strong> Assinatura incompleta. Preencha todos os campos do laudo para liberar o relatório.`;
+                feedback.className = 'feedback-box erro fade-in';
+                feedback.classList.remove('escondido');
+                return;
+            }
+
+            if (heranca === casoAtual.respostaHeranca && prob === casoAtual.respostaProbabilidade) {
+                feedback.innerHTML = `<strong>✅ Relatório Aprovado (Laudo Perfeito)</strong><br><br>${casoAtual.explicacao}`;
+                feedback.className = 'feedback-box sucesso fade-in';
+                
+                // GATILHO INVISÍVEL
+                if (typeof registrarConclusaoSilenciosa === "function") {
+                    registrarConclusaoSilenciosa("Central de Diagnóstico");
+                }
+            } else {
+                feedback.innerHTML = `<strong>❌ Erro de Classificação no Laudo.</strong><br><br>Repense os conceitos. Avalie cautelosamente a sintomatologia associada aos gêneros masculino/feminino ou se o traço pula gerações nas notas ambulatoriais e nos exames da base de dados acima de seu rascunho de Punnett.`;
+                feedback.className = 'feedback-box erro fade-in';
+            }
+            
+            feedback.classList.remove('escondido');
+        }
+
+        function abrirModalDoenca() {
+            if (!casoAtual) return;
+            document.getElementById('modal-titulo-doenca').innerText = casoAtual.doenca;
+            document.getElementById('modal-corpo-doenca').innerHTML = casoAtual.detalhesDoenca;
+            document.getElementById('modal-doenca').classList.add('ativo');
+        }
+
+        function fecharModalDoenca() {
+            document.getElementById('modal-doenca').classList.remove('ativo');
+        }
+
+        // Renderiza a lista na inicialização
+        renderizarListaDeCasos();
+
+    </script>
+
+    <!-- RASTREADOR INVISÍVEL PARA O RELATÓRIO DA MONITORIA -->
+    <script>
+        function registrarConclusaoSilenciosa(nomeDoModulo) {
+            const nome = localStorage.getItem('genelab_nome') || 'Aluno Desconhecido';
+            const matricula = localStorage.getItem('genelab_matricula') || 'Sem Matrícula';
+
+            // Cria uma trava silenciosa no navegador para não preencher a planilha 10x se o aluno clicar várias vezes
+            const chaveTrava = 'genelab_enviado_' + nomeDoModulo;
+            if (localStorage.getItem(chaveTrava) === 'true') {
+                return; // Se já mandou, não faz nada
+            }
+
+            // COLOQUE O SEU LINK DO GOOGLE APPS SCRIPT AQUI DENTRO DAS ASPAS:
+            const urlDaPlanilha = "https://script.google.com/macros/s/AKfycbxkAHZIgcJPbTUXMIJkGE4CBhSh0C5pl_7IgvTIWoc2idZxJmcdqPTFnkRxxoWXwdY/exec";
+
+            fetch(urlDaPlanilha, {
+                method: 'POST',
+                body: JSON.stringify({ nome: nome, matricula: matricula, modulo: nomeDoModulo }),
+                // Usar text/plain evita bloqueios de segurança (CORS) do navegador
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+            }).then(response => {
+                // Sucesso! O dado caiu na planilha. Trava o envio para este módulo.
+                localStorage.setItem(chaveTrava, 'true');
+            }).catch(error => {
+                console.error("Erro no rastreador:", error);
+            });
+        }
+    </script>
+</body>
+</html>

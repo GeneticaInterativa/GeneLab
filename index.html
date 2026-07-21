@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeneLab - Genética Interativa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- BARRA DE NAVEGAÇÃO -->
+    <nav class="navbar">
+        <!-- LOGO DESENHADA (TOPO) -->
+        <div class="logo-dinamica-topo">
+            <div class="icone-dna-custom">
+                <svg viewBox="0 0 40 50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Fita Azul -->
+                    <path d="M12 5 C 12 22, 28 28, 28 45" stroke="#0A2540" stroke-width="4.5"/>
+                    <!-- Fita Verde Água -->
+                    <path d="M28 5 C 28 22, 12 28, 12 45" stroke="#20B2AA" stroke-width="4.5"/>
+                    <!-- Ligações (Degraus) com toque de azul e verde -->
+                    <line x1="16" y1="11" x2="24" y2="11" stroke="#0A2540" stroke-width="2.5"/>
+                    <line x1="16" y1="39" x2="24" y2="39" stroke="#20B2AA" stroke-width="2.5"/>
+                </svg>
+            </div>
+            <div class="texto-logo-custom">
+                <h2>Gene<span>Lab</span></h2>
+                <p>Genética Interativa</p>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active">Início</a></li>
+            <!-- Abre o Pop-up de Conteúdos -->
+            <li><a href="#" onclick="abrirModalConteudos(); return false;">Conteúdos <span>&#711;</span></a></li>
+            <!-- Abre o Pop-up Sobre -->
+            <li><a href="#" onclick="abrirModal(); return false;">Sobre</a></li>
+            <li><a href="#">Contato</a></li>
+        </ul>
+        <div class="nav-actions">
+            <input type="text" placeholder="Buscar..." class="search-bar">
+           <button class="btn-entrar" id="btn-usuario-topo" onclick="abrirModalLogin()">Entrar</button>
+        </div>
+    </nav>
+
+    <!-- SEÇÃO HERO (DESTAQUE) -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Explore a <span style="color: #20B2AA;">genética</span> <br>humana e médica</h1>
+            <p>Aprenda, interaja e descubra como a genética influencia nossa saúde, hereditariedade e o futuro da medicina.</p>
+            <div class="hero-buttons">
+               <button class="btn-primary" onclick="window.location.href='#temas'">Explorar conteúdos &rarr;</button>
+                <button class="btn-secondary" onclick="abrirModal('Sobre o <span>Projeto</span>', 'História do GeneLab.')">
+                    &#9432; Sobre o projeto
+                </button>
+            </div>
+        </div>
+        
+        <div class="hero-visual" id="hero-dna-canvas"></div>
+    </header>
+
+    <!-- SEÇÃO DE TEMAS (MÓDULOS) -->
+    <section id="temas" class="temas-section">
+        <div class="section-header">
+            <div class="line"></div>
+            <h2>Explore por temas</h2>
+            <p>Navegue por nossos principais módulos interativos</p>
+        </div>
+
+        <div class="container-modulos">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="icone icone-verde">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7 4c-1 0-2 1-2 2 0 2 3 4 5 6-2 2-5 4-5 6 0 1 1 2 2 2 2 0 4-2 5-5 1 3 3 5 5 5 1 0 2-1 2-2 0-2-3-4-5-6 2-2 5-4 5-6 0-1-1-2-2-2-2 0-4 2-5 5-1-3-3-5-5-5z" fill="rgba(32,178,170,0.15)"></path>
+                    </svg>
+                </div>
+                <h3>Princípios de Herança</h3>
+                <p>Entenda como as características são transmitidas de geração em geração.</p>
+                <button class="btn-explorar" onclick="window.location.href='mendel.html'">Explorar &rarr;</button>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="icone icone-azul">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#0A2540" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="3" width="6" height="6" fill="rgba(10,37,64,0.1)"></rect>
+                        <circle cx="17" cy="6" r="3" fill="rgba(10,37,64,0.1)"></circle>
+                        <line x1="10" y1="6" x2="14" y2="6"></line>
+                        <line x1="12" y1="6" x2="12" y2="13"></line>
+                        <line x1="8" y1="13" x2="16" y2="13"></line>
+                        <rect x="5" y="13" width="6" height="6" fill="rgba(10,37,64,0.1)"></rect>
+                        <circle cx="17" cy="16" r="3" fill="rgba(10,37,64,0.1)"></circle>
+                    </svg>
+                </div>
+                <h3>Heredogramas</h3>
+                <p>Construa e analise heredogramas para entender padrões de herança genética.</p>
+                <button class="btn-explorar" onclick="window.location.href='heredograma.html'">Explorar &rarr;</button>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="icone icone-roxo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#6A5ACD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 18h8"></path>
+                        <path d="M3 22h18"></path>
+                        <path d="M14 22a7 7 0 1 0 0-14h-1"></path>
+                        <path d="M9 14h2"></path>
+                        <path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z" fill="rgba(106,90,205,0.1)"></path>
+                        <path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"></path>
+                    </svg>
+                </div>
+                <h3>Mundo Molecular</h3>
+                <p>Explore a estrutura do DNA, RNA e proteínas em um ambiente interativo.</p>
+                <button class="btn-explorar" onclick="window.location.href='molecular.html'">Explorar &rarr;</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- NOVA SEÇÃO APRENDIZADO INTERATIVO (DESIGN 2) -->
+    <section class="aprendizado-section">
+        <div class="aprendizado-container">
+            <!-- Lado Esquerdo: Textos -->
+            <div class="aprendizado-texto">
+                <div class="badge">⚙️ APRENDIZADO INTERATIVO</div>
+                <h2>Entenda a <span>genética</span><br>em cada detalhe</h2>
+                <p class="desc">Uma experiência interativa que conecta você ao funcionamento da vida em nível molecular.</p>
+
+                <div class="topico-lista">
+                    <div class="topico-item">
+                        <div class="topico-icone-pequeno icone-verde">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M7 3c0 4 10 5 10 9s-10 5-10 9"></path>
+                                <path d="M17 3c0 4-10 5-10 9s10 5 10 9"></path>
+                            </svg>
+                        </div>
+                        <div class="topico-conteudo-novo">
+                            <h4>Estrutura do DNA</h4>
+                            <p>Explore a estrutura da dupla hélice, bases nitrogenadas e ligações.</p>
+                        </div>
+                    </div>
+
+                    <div class="topico-item">
+                        <div class="topico-icone-pequeno icone-roxo">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#6A5ACD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.5 2.6L21 8"></path>
+                                <polyline points="21 3 21 8 16 8"></polyline>
+                                <path d="M10 10c0 1 4 1 4 2s-4 1-4 2"></path>
+                            </svg>
+                        </div>
+                        <div class="topico-conteudo-novo">
+                            <h4>Replicação e expressão</h4>
+                            <p>Aprenda como o DNA é replicado e como as informações são expressas.</p>
+                        </div>
+                    </div>
+
+                    <div class="topico-item">
+                        <div class="topico-icone-pequeno icone-azul">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#0A2540" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z" fill="rgba(10,37,64,0.05)"></path>
+                                <polyline points="6 10 9 10 11 14 13 6 15 10 18 10"></polyline>
+                            </svg>
+                        </div>
+                        <div class="topico-conteudo-novo">
+                            <h4>Genética e saúde</h4>
+                            <p>Descubra como as variações genéticas influenciam doenças e tratamentos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lado Direito: Gráfico Molecular Detalhado -->
+            <div class="aprendizado-grafico-molecular">
+                <div id="dna-canvas-container"></div>
+                <div id="info-panel">
+                    <h2 id="info-titulo">Ligação</h2>
+                    <p id="info-texto">Clique em uma estrutura para ver os detalhes.</p>
+                    <button id="btn-fechar">Fechar</button>
+                </div>
+
+                <div class="card-detalhe card-pos-1">
+                    <h4>A dupla hélice</h4>
+                    <p>O DNA possui uma estrutura em espiral formada por duas fitas complementares.</p>
+                </div>
+                <div class="card-detalhe card-pos-2">
+                    <h4>Bases nitrogenadas</h4>
+                    <div class="bases-grid-mini">
+                        <div class="base a">A</div><div class="base t">T</div><div class="base c">C</div><div class="base g">G</div>
+                    </div>
+                    <div class="bases-nomes-mini">
+                        <span>Adenina</span><span>Timina</span><span>Citosina</span><span>Guanina</span>
+                    </div>
+                    <p class="nota-bases">As bases se pareiam de forma específica: A com T e C com G.</p>
+                </div>
+                <div class="card-detalhe card-pos-3">
+                    <h4>Esqueleto açúcar-fosfato</h4>
+                    <p>As moléculas de açúcar (desoxirribose) e fosfato formam a estrutura que sustenta o DNA.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO CTA -->
+    <section class="cta-section">
+        <div class="cta-box">
+            <div class="cta-text">
+                <div class="lamp-icon">💡</div>
+                <div>
+                    <h2>Curioso para aprender mais?</h2>
+                    <p>Junte-se ao GeneLab e transforme sua forma de aprender genética.</p>
+                </div>
+            </div>
+            <button class="btn-cta" onclick="window.location.href='#temas'">Explorar conteúdos &rarr;</button>
+        </div>
+    </section>
+
+    <!-- RODAPÉ -->
+    <footer>
+        <!-- MARCA D'ÁGUA GIGANTE (FUNDO DO RODAPÉ) -->
+        <div class="footer-watermark">
+            <svg viewBox="0 0 40 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Fita Branca -->
+                <path d="M12 -10 C 12 7, 28 13, 28 30 C 28 47, 12 53, 12 70 C 12 87, 28 93, 28 110" stroke="#FFFFFF" stroke-width="2"/>
+                <!-- Fita Verde Água -->
+                <path d="M28 -10 C 28 7, 12 13, 12 30 C 12 47, 28 53, 28 70 C 28 87, 12 93, 12 110" stroke="#20B2AA" stroke-width="2"/>
+                <!-- Degraus -->
+                <line x1="16" y1="1" x2="24" y2="1" stroke="#FFFFFF" stroke-width="1"/>
+                <line x1="19" y1="10" x2="21" y2="10" stroke="#20B2AA" stroke-width="1"/>
+                <line x1="19" y1="20" x2="21" y2="20" stroke="#FFFFFF" stroke-width="1"/>
+                <line x1="16" y1="29" x2="24" y2="29" stroke="#20B2AA" stroke-width="1"/>
+                <line x1="16" y1="41" x2="24" y2="41" stroke="#FFFFFF" stroke-width="1"/>
+                <line x1="19" y1="50" x2="21" y2="50" stroke="#20B2AA" stroke-width="1"/>
+                <line x1="19" y1="60" x2="21" y2="60" stroke="#FFFFFF" stroke-width="1"/>
+                <line x1="16" y1="69" x2="24" y2="69" stroke="#20B2AA" stroke-width="1"/>
+                <line x1="16" y1="81" x2="24" y2="81" stroke="#FFFFFF" stroke-width="1"/>
+                <line x1="19" y1="90" x2="21" y2="90" stroke="#20B2AA" stroke-width="1"/>
+            </svg>
+        </div>
+
+        <!-- MODAL DE CONTEÚDOS (POP-UP) -->
+        <div id="modalConteudos" class="modal-overlay">
+            <div class="modal-content" style="max-width: 550px;">
+                <span class="fechar-modal" onclick="fecharModalConteudos()">&times;</span>
+                <h2>Nossos <span>Conteúdos</span></h2>
+                <p>Selecione um laboratório para iniciar seus estudos:</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 25px;">
+                    <button class="btn-secondary" style="text-align: left; padding: 15px 20px; display: flex; align-items: center; gap: 15px; width: 100%;" onclick="window.location.href='mendel.html'">
+                        <span style="font-size: 1.5rem;">🧬</span> 
+                        <span style="flex: 1;">Princípios de Herança</span>
+                        <span style="color: #20B2AA;">&rarr;</span>
+                    </button>
+                    
+                    <button class="btn-secondary" style="text-align: left; padding: 15px 20px; display: flex; align-items: center; gap: 15px; width: 100%;" onclick="window.location.href='heredograma.html'">
+                        <span style="font-size: 1.5rem;">📊</span> 
+                        <span style="flex: 1;">Heredogramas</span>
+                        <span style="color: #20B2AA;">&rarr;</span>
+                    </button>
+                    
+                    <button class="btn-secondary" style="text-align: left; padding: 15px 20px; display: flex; align-items: center; gap: 15px; width: 100%;" onclick="window.location.href='molecular.html'">
+                        <span style="font-size: 1.5rem;">🔬</span> 
+                        <span style="flex: 1;">Mundo Molecular</span>
+                        <span style="color: #20B2AA;">&rarr;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-content">
+            <div class="footer-logo">
+                <div class="logo-rodape-custom">
+                    <div class="icone-dna-custom">
+                        <svg viewBox="0 0 40 50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- Fita Branca -->
+                            <path d="M12 5 C 12 22, 28 28, 28 45" stroke="#FFFFFF" stroke-width="4.5"/>
+                            <!-- Fita Verde Água -->
+                            <path d="M28 5 C 28 22, 12 28, 12 45" stroke="#20B2AA" stroke-width="4.5"/>
+                            <!-- Ligações -->
+                            <line x1="16" y1="11" x2="24" y2="11" stroke="#FFFFFF" stroke-width="2.5"/>
+                            <line x1="16" y1="39" x2="24" y2="39" stroke="#20B2AA" stroke-width="2.5"/>
+                        </svg>
+                    </div>
+                    <div class="texto-logo-custom">
+                        <h2>Gene<span>Lab</span></h2>
+                        <p>Genética Interativa</p>
+                    </div>
+                </div>
+                <p>Promovemos o conhecimento em genética humana e médica de forma interativa, acessível e científica.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="#">Início</a></li>
+                    <li><a href="#temas">Conteúdos</a></li>
+                    <li><a href="#" onclick="abrirModal(); return false;">Sobre</a></li>
+                    <li><a href="#">Contato</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Temas</h4>
+                <ul>
+                    <li><a href="mendel.html">Princípios de Herança</a></li>
+                    <li><a href="heredograma.html">Heredogramas</a></li>
+                    <li><a href="molecular.html">Mundo Molecular</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 GeneLab. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+    
+    <!-- MODAL SOBRE O PROJETO (POP-UP) -->
+    <div id="modalSobre" class="modal-overlay">
+        <div class="modal-content">
+            <span class="fechar-modal" onclick="fecharModal()">&times;</span>
+            <h2>Sobre o <span>Projeto</span></h2>
+            <p>Escrever a história do projeto.</p>
+            <p><em>(Espaço reservado para adicionar o texto oficial posteriormente).</em></p>
+        </div>
+    </div>
+    
+    <!-- MODAL DE IDENTIFICAÇÃO (LOGIN DO ALUNO) -->
+    <div id="modalLogin" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <span class="fechar-modal" onclick="fecharModalLogin()">&times;</span>
+            <div style="font-size: 3rem; margin-bottom: 10px;">🎓</div>
+            <h2>Identificação <span>Estudantil</span></h2>
+            <p style="margin-bottom: 25px;">Insira seus dados para começar seus estudos no GeneLab.</p>
+            
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="font-size: 0.85rem; font-weight: 700; color: #5A6B80; display: block; margin-bottom: 5px;">Nome Completo</label>
+                <input type="text" id="input-nome" placeholder="Ex: Maria Silva" style="width: 100%; padding: 12px; border: 1px solid #E0E5EC; border-radius: 8px; font-size: 1rem; outline: none;">
+            </div>
+            
+            <div style="text-align: left; margin-bottom: 25px;">
+                <label style="font-size: 0.85rem; font-weight: 700; color: #5A6B80; display: block; margin-bottom: 5px;">Número de Matrícula</label>
+                <input type="text" id="input-matricula" placeholder="Ex: 202612345" style="width: 100%; padding: 12px; border: 1px solid #E0E5EC; border-radius: 8px; font-size: 1rem; outline: none;">
+            </div>
+            
+            <button class="btn-primary" style="width: 100%;" onclick="realizarLogin()">Acessar Bancadas</button>
+            <p id="msg-erro-login" style="color: #E74C3C; font-size: 0.85rem; margin-top: 15px; display: none;"></p>
+        </div>
+    </div>
+    
+    <!-- SCRIPTS DE FUNCIONAMENTO (LIMPOS E CONSOLIDADOS) -->
+    <script>
+        // --- 1. CONTROLE DOS MODAIS ---
+        function abrirModal() { document.getElementById('modalSobre').style.display = 'flex'; }
+        function fecharModal() { document.getElementById('modalSobre').style.display = 'none'; }
+
+        function abrirModalConteudos() { document.getElementById('modalConteudos').style.display = 'flex'; }
+        function fecharModalConteudos() { document.getElementById('modalConteudos').style.display = 'none'; }
+
+        function abrirModalLogin() { document.getElementById('modalLogin').style.display = 'flex'; }
+        function fecharModalLogin() { document.getElementById('modalLogin').style.display = 'none'; }
+
+        // Fechar clicando fora da caixa
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('modalSobre')) fecharModal();
+            if (event.target == document.getElementById('modalConteudos')) fecharModalConteudos();
+            if (event.target == document.getElementById('modalLogin')) fecharModalLogin();
+        }
+
+        // --- 2. SISTEMA DE LOGIN LOCAL ---
+        function realizarLogin() {
+            const nome = document.getElementById('input-nome').value.trim();
+            const matricula = document.getElementById('input-matricula').value.trim();
+            const msgErro = document.getElementById('msg-erro-login');
+
+            // Validação simples
+            if(nome === '' || matricula === '') {
+                msgErro.innerText = "Por favor, preencha seu nome e matrícula.";
+                msgErro.style.display = 'block';
+                return;
+            }
+
+            // Salva na "memória" do navegador do aluno
+            localStorage.setItem('genelab_nome', nome);
+            localStorage.setItem('genelab_matricula', matricula);
+            
+            fecharModalLogin();
+            atualizarInterfaceUsuario();
+        }
+
+        // Verifica se já tem alguém logado ao carregar a página
+        function atualizarInterfaceUsuario() {
+            const nomeSalvo = localStorage.getItem('genelab_nome');
+            const btnTopo = document.getElementById('btn-usuario-topo');
+            
+            if(nomeSalvo && btnTopo) {
+                // Pega apenas o primeiro nome para ficar amigável
+                const primeiroNome = nomeSalvo.split(' ')[0];
+                
+                // Muda o visual do botão
+                btnTopo.innerText = 'Olá, ' + primeiroNome;
+                btnTopo.style.backgroundColor = '#20B2AA'; // Fica verde indicando sucesso
+                btnTopo.style.cursor = 'default';
+                btnTopo.onclick = null; // Desativa o clique de abrir o pop-up
+            }
+        }
+
+        // Roda a verificação assim que o site abre
+        document.addEventListener('DOMContentLoaded', atualizarInterfaceUsuario);
+    </script>
+
+    <!-- SCRIPTS DO THREE.JS (DNA 3D E ANIMAÇÕES) -->
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+    <script type="module" src="hero-dna.js"></script>
+    <script type="module" src="main.js"></script>
+
+</body>
+</html>

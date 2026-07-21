@@ -1,0 +1,393 @@
+html { scroll-behavior: smooth; }
+
+/* RESET BÁSICO */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Montserrat', sans-serif; 
+    -webkit-tap-highlight-color: transparent; /* Remove aquele "piscar" cinza/azul ao tocar em botões no celular */
+}
+
+body { 
+    background-color: #FFFFFF; 
+    color: #1A2B4C; 
+    overflow-x: hidden; 
+    
+    /* BLOQUEIA A SELEÇÃO DE TEXTO NO SITE INTEIRO */
+    -webkit-user-select: none; 
+    -moz-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none; 
+}
+
+/* REGRA DE OURO: Liberar a seleção apenas em caixas de digitação */
+input, select, textarea {
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
+}
+
+/* --- BARRA DE NAVEGAÇÃO --- */
+.navbar { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 15px 5%; 
+    
+    /* Efeito Glassmorphism */
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+    
+    position: sticky; 
+    top: 0; 
+    z-index: 1000; 
+}
+.logo img { width: 200px; height: auto; object-fit: contain; }
+.nav-links { display: flex; list-style: none; gap: 30px; }
+.nav-links a { text-decoration: none; color: #1A2B4C; font-weight: 600; font-size: 0.9rem; transition: color 0.3s; }
+.nav-links a:hover, .nav-links a.active { color: #20B2AA; }
+.nav-actions { display: flex; gap: 15px; align-items: center; }
+.search-bar { padding: 10px 15px; border-radius: 20px; border: 1px solid #E0E5EC; background-color: #F4F7F9; font-family: 'Montserrat'; outline: none; }
+.btn-entrar { background-color: #0A2540; color: white; border: none; padding: 10px 25px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+.btn-entrar:hover { background-color: #1A3B5C; }
+
+/* --- HERO SECTION --- */
+.hero { 
+    position: relative; 
+    overflow: hidden; 
+    padding: 80px 5% 30px 5%; /* Redução do padding inferior para diminuir espaço branco */
+    min-height: 70vh; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    /* Gradiente vertical suave sugerido para dar profundidade */
+    background: linear-gradient(180deg, #ffffff 0%, #f3fbfd 50%, #eef7ff 100%);
+}
+.hero-content { 
+    max-width: 550px; 
+    margin-bottom: 10px; /* Aproximar os botões do limite inferior */
+    position: relative;
+    z-index: 2; /* Garante que fique acima do canvas 3D */
+}
+.hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.2; color: #0A2540; margin-bottom: 20px; }
+.hero h1 span { color: #040f26; }
+.hero p { 
+    font-size: 1.1rem; 
+    color: #4A5568; /* Escurecido para maior contraste */
+    font-weight: 500; /* Leve aumento no peso para legibilidade */
+    line-height: 1.6; 
+    margin-bottom: 40px; 
+}
+.hero-buttons { display: flex; gap: 20px; }
+.btn-primary { background-color: #0A2540; color: white; padding: 15px 30px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 1rem; transition: transform 0.3s; }
+.btn-secondary { background-color: transparent; color: #0A2540; padding: 15px 30px; border-radius: 8px; border: 2px solid #E0E5EC; font-weight: 600; cursor: pointer; font-size: 1rem; transition: border-color 0.3s; }
+.btn-primary:hover { transform: translateY(-3px); }
+.btn-secondary:hover { border-color: #20B2AA; }
+
+.hero-visual { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+.dna-bg { position: absolute; width: 140%; max-width: 650px; right: -80px; z-index: 0; opacity: 0.9; animation: flutuarDNA 8s ease-in-out infinite; }
+@keyframes flutuarDNA { 0% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-15px) rotate(2deg); } 100% { transform: translateY(0px) rotate(0deg); } }
+
+/* --- DNA DECORATIVO DA SEÇÃO HERO --- */
+#hero-dna-canvas {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    margin-top: -30px; /* Sobe levemente o DNA para preencher espaços vazios */
+}
+
+/* --- SEÇÃO DE TEMAS --- */
+.temas-section { 
+    padding: 80px 5%; 
+    background-color: #eff1f3; 
+    border-top: 1px solid #EAEFF4; 
+    border-bottom: 1px solid #EAEFF4; 
+}
+.section-header { margin-bottom: 50px; }
+.section-header .line { width: 40px; height: 3px; background-color: #20B2AA; margin-bottom: 15px; }
+.section-header h2 { font-size: 2rem; color: #0A2540; margin-bottom: 10px; }
+.section-header p { color: #5A6B80; }
+.container-modulos { display: flex; justify-content: space-between; gap: 30px; }
+.card { background-color: #FFFFFF; flex: 1; padding: 40px 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); text-align: center; border-bottom: 5px solid transparent; transition: 0.4s ease; }
+.card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+.card:nth-child(1):hover { border-bottom-color: #20B2AA; }
+.card:nth-child(2):hover { border-bottom-color: #0A2540; }
+.card:nth-child(3):hover { border-bottom-color: #6A5ACD; }
+.icone { width: 80px; height: 80px; margin: 0 auto 25px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.icone svg { width: 40px; height: 40px; }
+.icone-verde { background-color: #E0F2F1; }
+.icone-azul { background-color: #E3F2FD; }
+.icone-roxo { background-color: #EDE7F6; }
+.card h3 { font-size: 1.3rem; margin-bottom: 15px; color: #0A2540; }
+.card p { font-size: 0.95rem; color: #5A6B80; /* Escurecido para melhor leitura */ margin-bottom: 25px; line-height: 1.5; }
+.btn-explorar { background: none; border: 1px solid #E0E5EC; padding: 10px 20px; border-radius: 20px; font-weight: 600; color: #0A2540; cursor: pointer; transition: 0.3s; }
+.card:hover .btn-explorar { background-color: #F4F7F9; }
+
+/* --- NOVA SEÇÃO APRENDIZADO INTERATIVO (DESIGN 2) --- */
+.aprendizado-section { 
+    padding: 80px 5%; 
+    background-color: #FFFFFF; 
+}
+
+.aprendizado-container { 
+    background-color: #FAFCFC; 
+    border: 1px solid #EAEFF4;
+    border-radius: 24px; 
+    padding: 60px; 
+    display: flex; 
+    gap: 40px; 
+    box-shadow: 0 15px 40px rgba(0,0,0,0.03); 
+    align-items: center; 
+}
+/* Lado Esquerdo */
+.aprendizado-texto { flex: 1; max-width: 450px; }
+.badge { background-color: #E0F2F1; color: #20B2AA; padding: 8px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; letter-spacing: 1px; margin-bottom: 20px; }
+.aprendizado-texto h2 { font-size: 2.5rem; color: #0A2540; line-height: 1.2; margin-bottom: 15px; font-weight: 800; }
+.aprendizado-texto h2 span { color: #20B2AA; }
+.aprendizado-texto .desc { color: #4A5568; /* Aumentado Contraste */ font-size: 1rem; line-height: 1.6; margin-bottom: 30px; font-weight: 500;}
+
+.topico-lista { display: flex; flex-direction: column; gap: 20px; }
+.topico-item { display: flex; gap: 15px; align-items: flex-start; }
+.topico-icone-pequeno { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.topico-icone-pequeno svg { width: 20px; height: 20px; }
+.topico-conteudo-novo h4 { color: #0A2540; font-size: 1rem; margin-bottom: 4px; }
+.topico-conteudo-novo p { color: #5A6B80; /* Aumentado Contraste */ font-size: 0.85rem; line-height: 1.4; }
+.mt-20 { margin-top: 30px; }
+
+/* Lado Direito: Gráfico Molecular */
+.aprendizado-grafico-molecular { 
+    flex: 1.5; 
+    position: relative; 
+    min-height: 550px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: flex-start; 
+}
+
+/* 1. APROXIMANDO O DNA DO TEXTO */
+.dna-centro { 
+    position: absolute; 
+    left: 20%; 
+    height: 105%; 
+    max-height: 600px; 
+    width: auto; 
+    animation: float 4s ease-in-out infinite; 
+    z-index: 2; 
+}
+
+/* Estilo Base dos Cards Flutuantes */
+.card-detalhe { 
+    position: absolute; 
+    right: 0; 
+    width: 300px; 
+    background: #FFFFFF; 
+    border-radius: 12px; 
+    padding: 20px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
+    z-index: 3; 
+}
+.card-detalhe h4 { color: #0A2540; font-size: 1rem; margin-bottom: 8px; }
+.card-detalhe p { color: #5A6B80; /* Aumentado Contraste */ font-size: 0.85rem; line-height: 1.4; }
+
+/* 2. PREPARANDO AS LINHAS PARA SEREM ESTICADAS */
+.card-detalhe::before { 
+    content: ''; 
+    position: absolute; 
+    top: 25px; 
+    height: 1.5px; 
+    background-color: #B0C4DE; 
+}
+.card-detalhe::after { 
+    content: ''; 
+    position: absolute; 
+    top: 21.5px; 
+    width: 8px; 
+    height: 8px; 
+    border-radius: 50%; 
+    background-color: #FFFFFF; 
+    border: 2px solid #20B2AA; 
+}
+
+/* 3. O SEGREDO: TAMANHOS DIFERENTES PARA CADA LINHA! */
+/* Card 1 (Topo) */
+.card-pos-1 { top: 5%; }
+.card-pos-1::before { width: 30px; left: -30px; }
+.card-pos-1::after { left: -34px; } 
+
+/* Card 2 (Meio) */
+.card-pos-2 { top: 32%; }
+.card-pos-2::before { width: 150px; left: -150px; }
+.card-pos-2::after { left: -154px; }
+
+/* Card 3 (Base) */
+.card-pos-3 { bottom: 10%; }
+.card-pos-3::before { width: 315px; left: -315px; }
+.card-pos-3::after { left: -319px; }
+
+
+/* Grid de Bases Nitrogenadas (Card Central) */
+.bases-grid-mini { display: flex; justify-content: space-between; margin: 15px 0 10px 0; }
+.base { width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 1.1rem; }
+.base.a { background-color: #d3d603; } 
+.base.t { background-color: #9CCC65; } 
+.base.c { background-color: #20B2AA; } 
+.base.g { background-color: #FF7043; } 
+.bases-nomes-mini { display: flex; justify-content: space-between; font-size: 0.7rem; color: #5A6B80; margin-bottom: 15px; text-align: center; font-weight: 600; }
+.bases-nomes-mini span { flex: 1; }
+.nota-bases { background: #F4F7F9; padding: 10px; border-radius: 6px; font-size: 0.75rem !important; }
+
+@keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
+
+/* --- CTA SECTION --- */
+.cta-section { 
+    padding: 80px 5%; 
+    background-color: #ffffff; 
+}
+.cta-box { background: linear-gradient(90deg, #0A2540 0%, #20B2AA 100%); border-radius: 20px; padding: 40px 50px; display: flex; justify-content: space-between; align-items: center; color: white; }
+.cta-text { display: flex; align-items: center; gap: 20px; }
+.lamp-icon { font-size: 3rem; background: rgba(255,255,255,0.2); width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+.cta-text h2 { font-size: 1.8rem; margin-bottom: 5px; }
+.cta-text p { opacity: 0.9; }
+.btn-cta { background-color: #FFFFFF; color: #0A2540; border: none; padding: 15px 30px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+/* --- RODAPÉ --- */
+/* --- RODAPÉ --- */
+footer { 
+    background-color: #0A2540; 
+    color: white; 
+    padding: 60px 5% 20px 5%; 
+    position: relative; /* OBRIGATÓRIO: Prende a marca d'água dentro do rodapé */
+    overflow: hidden; /* OBRIGATÓRIO: Corta o excesso do DNA gigante para não vazar para fora da página */
+}
+
+/* Coloca todos os links e textos do rodapé "para cima", protegendo do z-index da marca d'água */
+.footer-content, .footer-bottom, .modal-overlay { 
+    position: relative; 
+    z-index: 2; 
+}
+
+/* ESTILO DA MARCA D'ÁGUA GIGANTE */
+.footer-watermark {
+    position: absolute;
+    top: -10%; 
+    right: 15%; /* Posiciona no lado direito do rodapé */
+    height: 120%; /* Tamanho gigante estourando as bordas */
+    opacity: 0.15; /* Exatamente 15% de opacidade */
+    z-index: 1; /* Fica afundado atrás do conteúdo */
+    pointer-events: none; /* O mouse ignora ela, permitindo clicar nos links por cima */
+    transform: rotate(20deg); /* Inclinação suave para dar mais dinâmica */
+}
+
+.footer-watermark svg {
+    height: 100%;
+    width: auto;
+}
+.footer-content { display: flex; justify-content: space-between; margin-bottom: 50px; }
+.footer-logo { max-width: 300px; }
+/* --- LOGO CUSTOMIZADA DO RODAPÉ --- */
+.logo-rodape-custom { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.icone-dna-custom svg { width: 42px; height: 52px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+
+.logo-dinamica-topo .texto-logo-custom h2 { color: #0A2540; }
+.logo-dinamica-topo { display: flex !important; flex-direction: row !important; align-items: center; gap: 12px; flex-shrink: 0; }
+.texto-logo-custom h2 { font-size: 2.2rem; color: #FFFFFF; font-weight: 800; letter-spacing: -1px; margin-bottom: 2px; line-height: 1; }
+.texto-logo-custom h2 span { color: #20B2AA; }
+.texto-logo-custom p { font-size: 0.65rem; color: #0A2540; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase; margin: 0; opacity: 0.9; }
+
+.rodape-dna-icon svg { width: 50px; height: 50px; margin-bottom: 15px; opacity: 0.9; }
+.footer-logo p { font-size: 0.9rem; line-height: 1.6; color: #A0B0C0; }
+.footer-links h4 { margin-bottom: 20px; font-size: 1.1rem; }
+.footer-links ul { list-style: none; }
+.footer-links li { margin-bottom: 12px; }
+.footer-links a { color: #A0B0C0; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+.footer-links a:hover { color: #20B2AA; }
+.footer-bottom { text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; color: #A0B0C0; font-size: 0.85rem; }
+
+/* --- MODAL (POP-UP) --- */
+.modal-overlay {
+    display: none; 
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(10, 37, 64, 0.7); 
+    z-index: 1000; 
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px); 
+}
+.modal-content { background-color: #FFFFFF; padding: 40px; border-radius: 16px; max-width: 500px; width: 90%; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: modalFadeIn 0.3s ease-out; }
+.fechar-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: #A0B0C0; cursor: pointer; transition: 0.3s; line-height: 1; }
+.fechar-modal:hover { color: #E74C3C; }
+.modal-content h2 { color: #20B2AA; margin-bottom: 20px; font-size: 1.8rem; }
+.modal-content h2 span { color: #20B2AA; }
+.modal-content p { color: #5A6B80; line-height: 1.6; margin-bottom: 15px; font-size: 0.95rem; }
+@keyframes modalFadeIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- INTEGRAÇÃO DO DNA 3D --- */
+#dna-canvas-container { position: absolute; top: 0; left: -10%; width: 110%; height: 100%; z-index: 5; cursor: grab; }
+#dna-canvas-container:active { cursor: grabbing; }
+
+#info-panel { display: none; position: absolute; bottom: 30px; left: 45%; transform: translateX(-50%); width: 90%; max-width: 320px; background: rgba(10, 37, 64, 0.95); border: 1px solid rgba(32, 178, 170, 0.3); border-radius: 12px; padding: 20px; color: white; box-shadow: 0 15px 40px rgba(0,0,0,0.2); backdrop-filter: blur(8px); z-index: 10; }
+#info-panel h2 { margin-top: 0; font-size: 1.1rem; color: #20B2AA; margin-bottom: 10px; }
+#info-panel p { font-size: 0.9rem; line-height: 1.5; color: #E0E5EC; }
+#btn-fechar { background-color: transparent; color: #20B2AA; border: 1px solid #20B2AA; padding: 8px 16px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 15px; transition: 0.3s; font-weight: 600; }
+#btn-fechar:hover { background-color: #20B2AA; color: #0A2540; }
+
+/* --- SIDEBAR E CARDS --- */
+.molecular-sidebar { width: 300px; display: flex; flex-direction: column; gap: 15px; }
+.card-modulo { background: #FFFFFF; padding: 20px; border-radius: 12px; border-left: 5px solid #E0E5EC; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.card-modulo:hover { border-left-color: #20B2AA; background: #FAFCFC; transform: translateX(5px); }
+.badge-mod { font-size: 0.7rem; font-weight: 800; color: #79859C; margin-bottom: 5px; text-transform: uppercase; }
+.card-modulo h4 { color: #0A2540; font-size: 1rem; margin-bottom: 5px; }
+.card-modulo p { font-size: 0.85rem; color: #5A6B80; }
+.mendel-sidebar { width: 350px; position: sticky; top: 100px; height: fit-content; display: flex; flex-direction: column; gap: 20px; }
+.container-app { display: flex; align-items: flex-start; gap: 40px; }
+
+/* =======================================================
+   RESPONSIVIDADE (Telas Menores, Tablets e Celulares)
+======================================================= */
+@media (max-width: 992px) {
+    .navbar { flex-direction: column; gap: 15px; text-align: center; }
+    .nav-links { flex-wrap: wrap; justify-content: center; gap: 15px; }
+    .nav-actions { margin-top: 10px; }
+
+    .hero { flex-direction: column; text-align: center; padding: 40px 5%; min-height: auto; }
+    .hero-content { max-width: 100%; margin-bottom: 40px; z-index: 5; }
+    .hero h1 { font-size: 2.8rem; }
+    .hero-buttons { justify-content: center; flex-wrap: wrap; }
+    .hero-visual { width: 100%; height: 350px; position: relative; right: auto; display: block; }
+    
+    #hero-dna-canvas { position: relative !important; width: 100% !important; height: 220px !important; min-height: 220px !important; right: auto !important; margin-top: 0px !important; }
+    
+    .container-modulos { flex-direction: column; gap: 20px; }
+    .card { width: 100%; }
+
+    .aprendizado-container { flex-direction: column; padding: 30px 20px; text-align: center; }
+    .aprendizado-texto { max-width: 100%; }
+    .topico-item { text-align: left; }
+    
+    .aprendizado-grafico-molecular { min-height: auto; flex-direction: column; gap: 15px; padding-top: 20px; width: 100%; display: block; }
+    #dna-canvas-container { position: relative !important; width: 100% !important; height: 350px !important; left: auto !important; }
+    
+    .card-detalhe { position: relative; width: 100%; top: auto !important; right: auto; margin-bottom: 10px; }
+    .card-detalhe::before, .card-detalhe::after { display: none; }
+
+    .cta-box { flex-direction: column; text-align: center; gap: 20px; padding: 30px 20px; }
+    .cta-text { flex-direction: column; gap: 15px; }
+
+    .footer-content { flex-direction: column; gap: 40px; text-align: center; }
+    .logo-rodape-custom { justify-content: center; }
+}
+
+@media (max-width: 576px) {
+    .hero h1 { font-size: 2.2rem; }
+    .aprendizado-texto h2 { font-size: 2rem; }
+    .btn-primary, .btn-secondary, .btn-cta { width: 100%; margin-bottom: 10px; }
+}

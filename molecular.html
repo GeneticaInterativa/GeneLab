@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>Mundo Molecular | GeneLab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           ESTILOS BASE E SCALA GLOBAL 
+           ========================================= */
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        html, body { 
+            max-width: 100vw; 
+            overflow-x: hidden; 
+        }
+
+        html { font-size: 16px; height: 100%; background-color: #EEF4FF; }
+        
+        body { 
+            background: linear-gradient(135deg, #F8FAFC, #EEF4FF) no-repeat center center fixed; 
+            background-size: cover;
+            color: #1A2B4C; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
+        }
+        
+        input, select {
+            -webkit-user-select: auto;
+            -moz-user-select: auto;
+            -ms-user-select: auto;
+            user-select: auto;
+        }
+
+        body.modal-aberto { overflow: hidden; } 
+        
+        .lab-navbar { background-color: #0A2540; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; color: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-voltar { color: #20B2AA; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; cursor: pointer; }
+        .btn-voltar:hover { color: #FFFFFF; }
+        .lab-logo { font-size: 1.5rem; font-weight: 800; }
+        .lab-logo span { color: #20B2AA; }
+
+        .container-app { padding: 40px 5%; max-width: 1600px; width: 95%; margin: 0 auto; display: flex; gap: 30px; align-items: flex-start; }
+
+        /* =========================================
+           PAINEL DIDÁTICO E SIDEBAR
+           ========================================= */
+        .molecular-base { flex: 3; min-width: 0; max-width: 100%; background: #FFFFFF; padding: 50px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); min-height: 800px; position: relative; }
+        
+        .molecular-sidebar { flex: 1; min-width: 0; max-width: 100%; position: sticky; top: 90px; display: flex; flex-direction: column; gap: 15px; }
+
+        @media (max-width: 1024px) {
+            html { font-size: 14px; } 
+            .container-app { flex-direction: column-reverse; flex-wrap: wrap; padding: 30px 4%; gap: 20px; width: 100%; }
+            .molecular-base { padding: 30px 20px; width: 100%; flex: none; }
+            .molecular-sidebar { width: 100%; flex: none; position: relative; top: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        }
+        
+        /* =========================================
+           AJUSTES PARA MOBILE (TELA PEQUENA)
+           ========================================= */
+        @media (max-width: 600px) {
+            html { font-size: 12px; } 
+            .molecular-sidebar { grid-template-columns: 1fr; }
+            .molecular-base { padding: 25px 15px; border-radius: 12px; }
+            
+            /* Resolve o estouro de tela (Grid Blowout) */
+            .grid-bancada > div { min-width: 0; max-width: 100%; }
+            .gel-wrapper { max-width: 100%; overflow-x: auto; }
+            
+            /* Ajusta as abas para caberem lado a lado */
+            .tab-btn { min-width: 0; flex: 1; padding: 12px 2px; font-size: 0.75rem; }
+            .tabs-content { padding: 15px; }
+            .paciente-banner { padding: 15px; }
+            
+            /* Ajusta a Máquina de PCR para não cortar o texto */
+            .maquina-pcr { flex-direction: column; }
+            .visor-pcr { min-width: 100%; font-size: 0.95rem; }
+            #btn-pcr { width: 100%; }
+            #btn-correr-gel { width: 100%; margin-top: 10px; }
+            
+            /* Reduz a largura mínima do Transiluminador (temos menos pistas agora) */
+            .transiluminador { min-width: 500px; }
+        }
+
+        .dogma-flow { position: relative; padding-left: 30px; border-left: 3px solid #E0E5EC; }
+        .dogma-step { margin-bottom: 60px; position: relative; }
+        .dogma-step::before { content: ''; position: absolute; left: -42px; top: 0; width: 20px; height: 20px; background: #20B2AA; border-radius: 50%; border: 4px solid #FFFFFF; box-shadow: 0 0 0 3px #20B2AA; }
+        .dogma-step h2 { color: #0A2540; margin-bottom: 15px; }
+        .texto-didatico { color: #5A6B80; line-height: 1.8; font-size: 1.1rem; margin-bottom: 15px; }
+        .highlight { color: #20B2AA; font-weight: 700; }
+
+        .card-modulo { background: #FFFFFF; padding: 25px; border-radius: 12px; border-left: 5px solid #0A2540; box-shadow: 0 6px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; }
+        .card-modulo:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); border-left-color: #20B2AA; }
+        .badge-mod { font-size: 0.75rem; background: #0A2540; color: white; padding: 6px 12px; border-radius: 4px; display: inline-block; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card-modulo h4 { color: #0A2540; margin-bottom: 8px; font-size: 1.1rem; }
+        .card-modulo p { font-size: 0.85rem; color: #5A6B80; line-height: 1.5; }
+        
+        .escondido { display: none !important; }
+
+        /* =========================================
+           BANCADA 02: MUTATION EDITOR E ENSAIO
+           ========================================= */
+        .painel-missao { background: #E8F8F5; border: 2px solid #20B2AA; border-radius: 12px; padding: 25px; margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px; }
+        .painel-missao-header { display: flex; align-items: center; gap: 12px; color: #0A2540; font-weight: 800; font-size: 1.15rem; }
+        .painel-missao-badge { background: #20B2AA; color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .painel-missao p { color: #17A589; font-size: 1rem; line-height: 1.6; font-weight: 500; }
+        
+        .missao-concluida-msg { display: none; background: #E0E5EC; color: #1A2B4C; border: 1px solid transparent; padding: 12px; border-radius: 8px; font-weight: bold; text-align: center; margin-top: 15px; font-size: 1rem; animation: fadeIn 0.5s; }
+
+        .dna-editor-box { background: #F8F9FA; padding: 35px; border-radius: 12px; border: 2px solid #E0E5EC; margin-bottom: 25px; width: 100%; min-width: 0; max-width: 100%; }
+        @media (max-width: 768px) { .dna-editor-box { padding: 20px; } }
+
+        .controle-modo { display: flex; align-items: center; justify-content: center; gap: 20px; background: #FFFFFF; padding: 15px; border-radius: 8px; border: 1px solid #CBD3DD; margin-bottom: 25px; flex-wrap: wrap; }
+        .controle-modo label { font-weight: 600; color: #0A2540; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem; }
+        .controle-modo input[type="radio"] { cursor: pointer; width: 18px; height: 18px; accent-color: #20B2AA; }
+
+        .seq-title { color: #0A2540; font-size: 1.05rem; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between; }
+        .seq-desc { font-size: 0.9rem; color: #5A6B80; margin-bottom: 5px; font-weight: normal; line-height: 1.5; }
+        
+        .scroll-container { 
+            width: 100%; 
+            max-width: 100%; 
+            overflow-x: auto; 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+            background: white; 
+            -webkit-overflow-scrolling: touch; 
+        }
+        
+        .dna-sequence { font-family: monospace; font-size: 1.7rem; color: #0A2540; padding: 15px 12px; border: 1px solid #ddd; border-radius: 8px; display: flex; gap: 6px; justify-content: flex-start; width: max-content; min-width: 100%; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); }
+        
+        .nucleotide { flex-shrink: 0; cursor: pointer; padding: 5px 10px; border-radius: 6px; transition: 0.2s; border: 2px solid transparent; font-weight: bold; }
+        .nucleotide:hover { background: #20B2AA; color: white; border-color: #178983; transform: scale(1.1); box-shadow: 0 4px 8px rgba(32, 178, 170, 0.3); }
+        .nucleotide.modo-del:hover { background: #E74C3C; border-color: #C0392B; box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3); }
+
+        @keyframes piscarMutacao {
+            0% { background: #2ECC71; color: white; border-color: #27AE60; transform: scale(1.15); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4); }
+            100% { background: transparent; color: #0A2540; border-color: transparent; transform: scale(1); box-shadow: none; }
+        }
+        .flash-verde { animation: piscarMutacao 0.5s ease-out; }
+
+        .rna-nucleotide { flex-shrink: 0; padding: 5px 10px; color: #17A589; font-weight: bold; border: 2px solid transparent; }
+        
+        .scroll-container-prot { 
+            width: 100%; 
+            max-width: 100%; 
+            overflow-x: auto; 
+            margin-bottom: 25px; 
+            border-radius: 8px; 
+            background: transparent; 
+            -webkit-overflow-scrolling: touch; 
+        }
+        .protein-output { display: flex; gap: 6px; justify-content: flex-start; transition: 0.3s; width: max-content; min-width: 100%; padding: 10px 10px 45px 10px; margin-top: -5px; }
+        
+        .aa-card { flex-shrink: 0; position: relative; background: #0A2540; color: white; padding: 12px 0; width: 110px; text-align: center; border-radius: 6px; font-weight: bold; font-family: monospace; font-size: 1.1rem; cursor: help; border-bottom: 4px solid #20B2AA; transition: 0.3s; }
+        
+        .aa-card:hover::after { content: attr(data-fullname); position: absolute; top: 130%; bottom: auto; left: 50%; transform: translateX(-50%); background: #1A2B4C; color: #20B2AA; padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; font-family: 'Montserrat', sans-serif; white-space: nowrap; box-shadow: 0 6px 12px rgba(0,0,0,0.25); pointer-events: none; z-index: 10; font-weight: 600; letter-spacing: 0.5px; }
+        .aa-card:first-child:hover::after { left: 0; transform: translateX(0); }
+        .aa-card:last-child:hover::after { left: auto; right: 0; transform: translateX(0); }
+
+        .stop-codon { background: #E74C3C; border-bottom-color: #C0392B; }
+        .stop-codon:hover::after { color: #FFDADA; }
+        .incomplete-codon { background: #E0E5EC; color: #5A6B80; border-bottom-color: #CBD3DD; cursor: not-allowed; }
+        .incomplete-codon:hover::after { color: #FFFFFF; }
+
+        .botoes-acao-lab { display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap; width: 100%; }
+        .btn-testar-funcao { flex: 2; min-width: 250px; padding: 18px; font-size: 1.1rem; font-weight: bold; background: #0A2540; color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(10, 37, 64, 0.2); }
+        .btn-testar-funcao:hover { background: #133a61; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(10, 37, 64, 0.3); }
+        .btn-restaurar { flex: 1; min-width: 180px; padding: 18px; font-size: 1rem; font-weight: bold; background: #E0E5EC; color: #5A6B80; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .btn-restaurar:hover { background: #CBD3DD; color: #0A2540; }
+        
+        .resultado-ensaio { margin-top: 20px; padding: 25px; border-radius: 8px; font-size: 1rem; line-height: 1.6; font-weight: 500; animation: fadeIn 0.4s; }
+        
+        .cascata-doenca { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 6px; font-size: 0.9rem; line-height: 1.6; color: #1A2B4C; border-left: 4px solid rgba(0,0,0,0.1); }
+        .cascata-doenca b { color: #0A2540; display: block; margin-bottom: 5px; font-size: 1rem; }
+
+        /* =========================================
+           ENCICLOPÉDIA E GENE INFO
+           ========================================= */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 37, 64, 0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 15px; }
+        .modal-content { background: white; padding: 40px; border-radius: 16px; width: 100%; max-width: 1000px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+        
+        .modal-content-small { max-width: 600px; text-align: center; padding: 40px 30px; }
+        .modal-content-small h2 { color: #20B2AA; margin-bottom: 15px; font-size: 1.6rem; }
+        .modal-content-small p { color: #5A6B80; line-height: 1.7; font-size: 1.05rem; }
+        
+        .btn-fechar-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2.5rem; cursor: pointer; color: #5A6B80; transition: 0.2s; line-height: 1; }
+        .btn-fechar-modal:hover { color: #E74C3C; }
+        .btn-fechar-modal-central { margin-top: 25px; padding: 12px 30px; background: #0A2540; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; }
+        .btn-fechar-modal-central:hover { background: #1A2B4C; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
+        .tabela-codons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 25px; }
+        
+        .aa-group-card { background: #F8F9FA; border: 1px solid #E0E5EC; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .aa-group-header { background: #0A2540; color: white; padding: 10px 15px; font-weight: bold; font-size: 1rem; display: flex; justify-content: space-between; }
+        .aa-group-body { padding: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .codon-badge { background: #E8F8F5; color: #17A589; border: 1px solid #A3E4D7; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 0.95rem; font-weight: bold; }
+        
+        .aa-group-card.stop-card .aa-group-header { background: #E74C3C; }
+        .aa-group-card.stop-card .codon-badge { background: #FDEDEC; color: #C0392B; border-color: #F5B7B1; }
+        .aa-group-card.start-card .aa-group-header { background: #27AE60; }
+        .aa-group-card.start-card .codon-badge { background: #E9F7EF; color: #1E8449; border-color: #A9DFBF; }
+
+        /* =========================================
+           BLOCO DE ENSINO E BANCADA 03
+           ========================================= */
+        .bloco-ensino { background: #FFFFFF; padding: 30px; border-radius: 12px; border: 1px solid #E0E5EC; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .bloco-ensino h4 { margin-bottom: 15px; display: flex; align-items: center; gap: 8px; font-size: 1.2rem; color: #20B2AA;}
+        .bloco-ensino p { color: #4A5568; font-size: 1rem; line-height: 1.8; margin-bottom: 15px; }
+
+        .prontuario-container { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid #E0E5EC; background: #FFFFFF; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .paciente-banner { background: #0A2540; color: #FFFFFF; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #20B2AA; flex-wrap: wrap; gap: 15px; }
+        .paciente-info .label { color: #8C9BAF; font-size: 0.85rem; text-transform: uppercase; margin-right: 5px; letter-spacing: 0.5px; }
+        .paciente-info .valor { font-weight: bold; font-size: 1.15rem; margin-right: 25px; font-family: monospace; }
+        
+        .status-badge { background: rgba(32, 178, 170, 0.1); color: #20B2AA; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; border: 1px solid #20B2AA; animation: piscar 2s infinite; }
+        @keyframes piscar { 0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(32,178,170,0.6); } 50% { opacity: 0.5; box-shadow: none; } }
+        
+        .tabs-nav { display: flex; background: #F8F9FA; border-bottom: 1px solid #E0E5EC; flex-wrap: wrap; }
+        .tab-btn { flex: 1; min-width: 120px; background: transparent; color: #5A6B80; border: none; padding: 16px 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.3s; border-bottom: 3px solid transparent; }
+        .tab-btn:hover { color: #0A2540; background: #F0F4F8; }
+        .tab-btn.ativo { color: #20B2AA; border-bottom: 3px solid #20B2AA; background: #FFFFFF; }
+        .tabs-content { padding: 30px; min-height: 500px; position: relative;}
+        .tab-pane { display: none; animation: fadeIn 0.4s ease-out; }
+        .tab-pane.ativo { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .secao-titulo { color: #0A2540; margin-top: 0; margin-bottom: 25px; font-size: 1.4rem; border-bottom: 2px solid #F0F4F8; padding-bottom: 10px; }
+        .dado-grupo { margin-bottom: 20px; }
+        .dado-label { color: #5A6B80; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .dado-texto { color: #4A5568; font-size: 1.05rem; line-height: 1.6; background: #F8F9FA; padding: 15px; border-radius: 8px; border-left: 4px solid #20B2AA; }
+        
+        .grid-bancada { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 30px; }
+        .maquina-pcr { background: #e9ecef; padding: 15px; border-radius: 8px; border: 1px solid #ced4da; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
+        .visor-pcr { background: #111; color: #888; font-family: 'Courier New', monospace; padding: 15px; border-radius: 8px; border: 3px solid #333; flex: 1; min-width: 200px; font-weight: bold; text-align: center; font-size: 1.05rem; }
+        .visor-pcr.ativo { color: #00ffcc; box-shadow: inset 0 0 15px rgba(0,255,204,0.2); }
+        
+        .config-gel-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .config-gel-header span { font-size: 0.9rem; font-weight: bold; color: #5A6B80; }
+        
+        .visor-voltagem { background: #000; color: #ff3333; font-family: 'Courier New', monospace; font-size: 1.6rem; padding: 10px 15px; border-radius: 6px; text-align: center; min-width: 70px; box-shadow: inset 0 0 10px rgba(255,51,51,0.2); }
+        /* WRAPPER E CUBA MAIOR PARA NÃO CORTAR AS PISTAS */
+        .gel-wrapper { width: 100%; overflow-x: auto; margin-top: 15px; padding-bottom: 15px; -webkit-overflow-scrolling: touch; }
+        .transiluminador { background: #111; border: 6px solid #333; border-radius: 8px; height: 420px; position: relative; display: flex; justify-content: space-around; padding: 15px 15px 15px 60px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); overflow: hidden; min-width: 500px; }
+        .luz-uv { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 255, 204, 0); pointer-events: none; transition: 1s; z-index: 1; }
+        .ligado .luz-uv { background: rgba(0, 255, 204, 0.05); box-shadow: inset 0 0 50px rgba(0, 255, 204, 0.2); }
+        
+        /* RÉGUAS DINÂMICAS */
+        .regua-bp { 
+            position: absolute; 
+            left: 15px; 
+            top: 0; 
+            width: 60px; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            color: rgba(255,255,255,0.4); 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            font-family: monospace; 
+            text-align: left;
+        }
+        .regua-bp span { 
+            position: absolute; 
+            white-space: nowrap; 
+        }
+        
+        .pista { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; border-right: 1px dashed rgba(255,255,255,0.05); z-index: 2; min-width: 0; }
+        .pista:last-child { border-right: none; }
+        .nome-amostra { color: #aaa; font-size: 0.65rem; font-weight: bold; margin-top: 10px; margin-bottom: 5px; text-align: center; font-family: monospace; height: 25px; width: 100%; display: flex; align-items: center; justify-content: center; line-height: 1.1; overflow: hidden; }
+        .poco { width: 30px; height: 6px; background: #000; border: 1px solid #444; margin-bottom: 6px; border-radius: 2px;}
+        .banda { width: 26px; height: 6px; background: #00ffcc; box-shadow: 0 0 8px #00ffcc; border-radius: 2px; position: absolute; top: 40px; opacity: 1; z-index: 2; visibility: hidden; }
+        
+        .btn-acao { background: #20B2AA; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; text-align: center;}
+        .btn-acao:hover { background: #178983; box-shadow: 0 4px 8px rgba(32, 178, 170, 0.3); }
+        .btn-sorteio { background: #0A2540; color: white; border: none; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; float: right; margin-bottom: 10px; font-size: 0.95rem;}
+        .btn-sorteio:hover { background: #1A2B4C; }
+    </style>
+</head>
+<body>
+
+    <nav class="lab-navbar">
+        <div class="btn-voltar" onclick="window.location.href='index.html'">Voltar para Recepção</div>
+        <div class="texto-logo-custom" style="color: white; margin-left: 10px;">
+            <h2 style="font-size: 1.5rem; margin:0;">Gene<span style="color: #20B2AA;">Lab</span></h2>
+        </div>
+    </nav>
+
+    <main class="container-app">
+        <section class="molecular-base">
+            
+            <!-- TELA 0: FUNDAMENTOS MOLECULARES (TEORIA) -->
+            <div id="interface-teoria">
+                <div class="info-header" style="margin-bottom: 40px;">
+                    <h1 style="color: #0A2540; font-size: 2.2rem; margin-bottom: 10px;">Fundamentos de Biologia Molecular</h1>
+                    <p style="color: #5A6B80; font-size: 1.1rem;">Como a informação genética se torna um fenótipo clínico e como o detectamos no laboratório.</p>
+                </div>
+                <div class="dogma-flow">
+                    <div class="dogma-step">
+                        <h2>1. O Código Genético e a Mutação (Bancada 02)</h2>
+                        <p class="texto-didatico">O DNA funciona como um manual de instruções, lido de 3 em 3 letras (<span class="highlight">códons</span>) para montar Proteínas. Quando ocorre uma alteração genética — seja trocando uma única letra (Substituição) ou apagando uma base (Deleção/Frameshift) — o corpo pode produzir proteínas inativas, causando doenças genéticas sistêmicas.</p>
+                    </div>
+                    <div class="dogma-step">
+                        <h2>2. Amplificação por PCR (Bancada 03)</h2>
+                        <p class="texto-didatico">Para enxergar o gene de um paciente, primeiro precisamos multiplicá-lo. A <span class="highlight">Reação em Cadeia da Polimerase (PCR)</span> atua como uma "fotocopiadora" molecular, localizando a região exata do defeito (ex: gene DMD) e criando milhões de cópias daquele fragmento para análise.</p>
+                    </div>
+                    <div class="dogma-step">
+                        <h2>3. Eletroforese e Diagnóstico (Bancada 03)</h2>
+                        <p class="texto-didatico">O DNA possui carga elétrica negativa. Ao aplicarmos voltagem em um gel de agarose, as moléculas migram para o polo positivo (+). <strong>A regra de ouro:</strong> <span class="highlight">Fragmentos menores e mais leves correm mais rápido</span>. Se um paciente possui uma deleção genética (perdeu material), a banda de DNA dele aparecerá mais abaixo no gel em comparação ao padrão saudável.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TELA: MUTATION EDITOR (BANCADA 02) -->
+            <div id="interface-mutacao" class="escondido">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                    <h1 style="color: #0A2540; font-size: 1.8rem;">Bancada 02: Editor e Ensaio Genético</h1>
+                    <button class="btn-acao" onclick="abrirModalCodons()" style="background: #0A2540; box-shadow: 0 4px 10px rgba(10, 37, 64, 0.3);">Enciclopédia: Tabela de Códons</button>
+                </div>
+                
+                <div style="background: #F0F4F8; padding: 25px; border-radius: 12px; border-left: 6px solid #3498db; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    <label style="font-weight:700; color:#0A2540; display: block; margin-bottom: 12px; font-size: 1.15rem;">Selecione o Banco de Genes:</label>
+                    <select id="select-gene" style="padding: 15px; width: 100%; border-radius: 8px; font-size: 1.05rem; border: 1px solid #bdc3c7; background: #fff; cursor: pointer; color: #1A2B4C; font-weight: 600;" onchange="mudarCenarioGene()">
+                        <option value="padrao">Cenário Didático (Treino Livre)</option>
+                        <option value="cftr">Gene CFTR (Cromossomo 7) - Fibrose Cística</option>
+                        <option value="hbb">Gene HBB (Cromossomo 11) - Anemia Falciforme</option>
+                        <option value="pah">Gene PAH (Cromossomo 12) - Fenilcetonúria</option>
+                        <option value="fgfr3">Gene FGFR3 (Cromossomo 4) - Acondroplasia</option>
+                        <option value="dmd">Gene DMD (Cromossomo X) - Distrofia de Duchenne</option>
+                    </select>
+                </div>
+
+                <div class="painel-missao" id="painel-missao">
+                    <div class="painel-missao-header">
+                        <span class="painel-missao-badge">Missão Ativa</span>
+                        <span id="titulo-missao">Exploração Livre</span>
+                    </div>
+                    <p id="desc-missao">Brinque livremente com os códons para entender os conceitos de START, STOP e troca de aminoácidos antes de assumir um caso clínico real.</p>
+                    <div id="missao-concluida" class="missao-concluida-msg">Diagnóstico Alvo Encontrado. Verifique o Laudo abaixo.</div>
+                </div>
+
+                <div class="dna-editor-box">
+                    <div class="controle-modo">
+                        <span style="font-size: 1.05rem; font-weight: 700; color: #178983; width: 100%; text-align: center; margin-bottom: 10px;">Selecione o mecanismo de mutação e clique nas bases abaixo:</span>
+                        <label><input type="radio" name="modo-mutacao" value="sub" checked onchange="atualizarEstiloBases()"> Substituição (Trocar Letra)</label>
+                        <label style="color: #C0392B;"><input type="radio" name="modo-mutacao" value="del" onchange="atualizarEstiloBases()"> Deleção (Apagar Letra - Frameshift)</label>
+                    </div>
+                    
+                    <div id="fonte-gene" style="font-size: 0.85rem; color: #8C9BAF; font-style: italic; margin-bottom: 15px; text-align: center;"></div>
+                    
+                    <div class="seq-title">1. Sequência de DNA (Fita Codificadora) <span style="font-size: 0.85rem; font-weight: normal; color: #E74C3C;">(Mutável)</span></div>
+                    <div class="scroll-container sync-scroll" id="scroll-dna">
+                        <div class="dna-sequence" id="dna-container"></div>
+                    </div>
+
+                    <div class="seq-title" style="margin-top: 15px;">2. RNA Mensageiro (Transcrição)</div>
+                    <div class="scroll-container sync-scroll" id="scroll-rna">
+                        <div class="dna-sequence" id="rna-container" style="background: #E8F8F5; border-color: #20B2AA;"></div>
+                    </div>
+
+                    <div class="seq-title" style="margin-top: 30px; border-top: 2px solid #E0E5EC; padding-top: 30px;">3. Cadeia Polipeptídica (Tradução)</div>
+                    <div class="seq-desc">Os blocos de construção. Passe o mouse sobre eles para ver o nome completo do aminoácido.</div>
+                    <div class="scroll-container-prot sync-scroll" id="scroll-prot">
+                        <div class="protein-output" id="protein-container"></div>
+                    </div>
+                    
+                    <div id="alert-mutacao" class="escondido" style="padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5; font-weight: 500;"></div>
+
+                    <div class="botoes-acao-lab">
+                        <button class="btn-testar-funcao" id="btn-ensaio-proteina" onclick="testarFuncaoProteica()">Avaliar Consequência Clínica (Testar Função)</button>
+                        <button class="btn-restaurar" onclick="restaurarDNA()">Restaurar DNA Original</button>
+                    </div>
+
+                    <div id="resultado-ensaio" class="resultado-ensaio escondido"></div>
+                </div>
+
+                <div class="bloco-ensino">
+                    <h4>O que acontece após a Tradução? (O Fenótipo)</h4>
+                    <p>A cadeia linear de aminoácidos formada acima ainda não é uma estrutura funcional. Ela precisa passar pelo processo de <strong>Enovelamento (Dobramento)</strong>. As cargas elétricas e afinidades químicas dos aminoácidos fazem com que essa "linha" se dobre, criando uma estrutura 3D complexa.</p>
+                    <p style="background: #F8F9FA; padding: 20px; border-left: 5px solid #20B2AA; border-radius: 6px; margin-top: 15px;">
+                        <strong>Nem toda mutação causa doença.</strong><br><br>Todos nós possuímos milhares de variações no DNA, e a maioria delas não provoca nenhum problema clínico. Algumas ocorrem em áreas não lidas do genoma, enquanto outras causam uma <em>Mutação Silenciosa</em>: a letra do DNA muda, mas a Tabela de Códons garante que o mesmo aminoácido seja entregue (devido à redundância do código genético). Nesses casos, a proteína se mantém intacta e funciona perfeitamente.<br><br>Contudo, se a mutação trocar um aminoácido crítico ou alterar a matriz de leitura inteira (Frameshift), a proteína se dobrará de maneira errada, perdendo sua função e causando doenças sistêmicas.
+                    </p>
+                </div>
+            </div>
+
+            <!-- TELA: BANCADA DE ELETROFORESE DINÂMICA (BANCADA 03) -->
+            <div id="interface-eletroforese" class="escondido">
+                <button class="btn-sorteio" onclick="carregarCasoAleatorio()">Chamar Próximo Paciente</button>
+                <div style="clear: both; margin-bottom: 20px;"></div>
+
+                <div class="prontuario-container">
+                    <header class="paciente-banner">
+                        <div class="paciente-info">
+                            <span class="label">PRONTUÁRIO:</span> <span class="valor" id="ui-id-prontuario">#HD-0000</span>
+                            <span class="label">Especialidade:</span> <span class="valor" id="ui-especialidade">Clínica</span>
+                        </div>
+                        <div class="status-badge" id="ui-doenca-badge">Carregando...</div>
+                    </header>
+
+                    <nav class="tabs-nav">
+                        <button class="tab-btn ativo" data-target="aba-caso">01. Anamnese</button>
+                        <button class="tab-btn" data-target="aba-laboratorio">02. Protocolo de Gel</button>
+                        <button class="tab-btn" data-target="aba-laudo">03. Laudo</button>
+                    </nav>
+
+                    <div class="tabs-content">
+                        <!-- Aba 1 -->
+                        <div id="aba-caso" class="tab-pane ativo">
+                            <h2 class="secao-titulo" id="ui-titulo-familia">Histórico Clínico e Familiar</h2>
+                            <div class="dado-grupo">
+                                <div class="dado-label">Histórico Familiar</div>
+                                <div class="dado-texto" id="ui-historico-fam" style="border-left-color: #F1C40F;">...</div>
+                            </div>
+                            <div class="dado-grupo">
+                                <div class="dado-label" id="ui-label-p1">Paciente 1: Carregando...</div>
+                                <div class="dado-texto" id="ui-desc-p1">...</div>
+                            </div>
+                            <div class="dado-grupo">
+                                <div class="dado-label" id="ui-label-p2">Paciente 2: Carregando...</div>
+                                <div class="dado-texto" id="ui-desc-p2">...</div>
+                            </div>
+                            <div class="dado-grupo">
+                                <div class="dado-label">Mecanismo Molecular Investigado</div>
+                                <div class="dado-texto" id="ui-mecanismo" style="border-left-color: #e74c3c;">...</div>
+                            </div>
+                        </div>
+                        
+                       <!-- Aba 2 (Laboratório de Eletroforese) -->
+                        <div id="aba-laboratorio" class="tab-pane">
+                            <div class="grid-bancada">
+                                
+                                <!-- MÓDULO PCR (EXAMES DE DNA) -->
+                                <div class="maquina-pcr" id="modulo-pcr">
+                                    <div class="visor-pcr" id="visor-pcr">TERMOCICLADOR INATIVO</div>
+                                    <button class="btn-acao" id="btn-pcr" style="background: #34495e;">1. AMPLIFICAR DNA</button>
+                                </div>
+
+                                <div style="background: #e9ecef; padding: 25px; border-radius: 12px;">
+                                    <div class="config-gel-header">
+                                        <span id="ui-cuba-info">Configurando Cuba...</span>
+                                    </div>
+                                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 15px; flex-wrap:wrap;">
+                                        <div class="visor-voltagem" id="visor-v">000V</div>
+                                        <input type="range" id="input-voltagem" min="0" max="250" step="5" value="0" style="flex:1;">
+                                        <button class="btn-acao" id="btn-correr-gel" style="background: #e74c3c;">2. CORRER GEL</button>
+                                    </div>
+                                    <div id="erro-bancada" style="display:none; background:#F8D7DA; color:#721C24; padding:12px; border-radius:6px; font-size: 1rem; margin-bottom:15px; line-height: 1.5;"></div>
+                                    
+                                    <!-- WRAPPER ENVOLVENDO O TRANSILUMINADOR -->
+                                    <div class="gel-wrapper">
+                                        <div class="transiluminador" id="caixa-uv">
+                                            <div class="luz-uv"></div>
+                                            
+                                           <!-- RÉGUA DINÂMICA: DNA -->
+                                            <div id="regua-dna" class="regua-bp">
+                                                <span style="top: 15px; color:#E74C3C;">- Polo</span>
+                                                <span style="top: 60px;">500 bp</span>
+                                                <span style="top: 130px;">400 bp</span>
+                                                <span style="top: 200px;">300 bp</span>
+                                                <span style="top: 270px;">200 bp</span>
+                                                <span style="top: 340px;">100 bp</span>
+                                                <span style="top: 395px; color:#2ECC71;">+ Polo</span>
+                                            </div>
+
+                                            <!-- PISTAS GERADAS POR JAVASCRIPT -->
+                                            <div id="gel-lanes-container" style="display: flex; justify-content: space-around; width: 100%; height: 100%; padding-left: 50px;"></div>
+                                            
+                                        </div>
+                                    </div> <!-- Fim do Wrapper -->
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aba 3 (Laudo) -->
+                        <div id="aba-laudo" class="tab-pane">
+                            <h2 class="secao-titulo">Emissão de Laudo Laboratorial</h2>
+                            <div class="dado-grupo">
+                                <div class="dado-label" id="ui-laudo-label-p1">Diagnóstico Paciente 1:</div>
+                                <select id="select-paciente1" style="width: 100%; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 1.05rem; border: 1px solid #bdc3c7;">
+                                    <option value="0">Selecione o parecer clínico...</option>
+                                    <option value="negativo">Negativo (Saudável)</option>
+                                    <option value="portador">Portador Assintomático (Traço)</option>
+                                    <option value="positivo">Positivo (Afetado)</option>
+                                </select>
+                            </div>
+                            <div class="dado-grupo">
+                                <div class="dado-label" id="ui-laudo-label-p2">Diagnóstico Paciente 2:</div>
+                                <select id="select-paciente2" style="width: 100%; padding: 15px; border-radius: 8px; margin-bottom: 30px; font-size: 1.05rem; border: 1px solid #bdc3c7;">
+                                    <option value="0">Selecione o parecer clínico...</option>
+                                    <option value="negativo">Negativo (Saudável)</option>
+                                    <option value="portador">Portador Assintomático (Traço)</option>
+                                    <option value="positivo">Positivo (Afetado)</option>
+                                </select>
+                            </div>
+                            
+                            <button class="btn-acao" id="btn-enviar-laudo" style="width: 100%; padding: 20px; font-size: 1.2rem;">ASSINAR LAUDO FINAL</button>
+                            <div id="feedback-laudo" style="display: none; margin-top: 25px; padding: 25px; border-radius: 10px; font-size: 1.05rem; line-height: 1.6;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BANCADA DE EXPERIMENTOS (LADO DIREITO - SIDEBAR) -->
+        <aside class="molecular-sidebar">
+            <div class="card-modulo" onclick="abrirInterface('teoria')" style="border-left-color: #F1C40F; background: #FFFFFF;">
+                <div class="badge-mod" style="background: #F1C40F; color: #0A2540;">FUNDAMENTOS</div>
+                <h4>A Base Molecular</h4>
+                <p>Retornar à teoria principal.</p>
+            </div>
+            <div class="card-modulo" onclick="abrirInterface('mutacao')" style="border-left-color: #E74C3C; background: #FFFFFF;">
+                <div class="badge-mod" style="background: #E74C3C;">BANCADA 02</div>
+                <h4>Mutação em Tempo Real</h4>
+                <p>Edite e teste o código genético.</p>
+            </div>
+            <div class="card-modulo" onclick="abrirInterface('eletroforese')" style="border-left-color: #20B2AA; background: #FFFFFF;">
+                <div class="badge-mod" style="background: #20B2AA;">BANCADA 03</div>
+                <h4>Laboratório de Eletroforese</h4>
+                <p>Diagnóstico clínico molecular.</p>
+            </div>
+        </aside>
+    </main>
+
+    <!-- MODAL DA ENCICLOPÉDIA MÉDICA -->
+    <div class="modal-overlay" id="modal-codons">
+        <div class="modal-content" onclick="event.stopPropagation();">
+            <button class="btn-fechar-modal" onclick="fecharModalCodons()">X</button>
+            <h2 style="color: #0A2540; margin-bottom: 5px; font-size: 2rem;">Enciclopédia de Aminoácidos</h2>
+            <p style="color: #5A6B80; margin-bottom: 30px; font-size: 1.1rem;">Abaixo estão os 20 aminoácidos biológicos e o sinal de Parada. Cada card mostra os códons (trincas de RNAm) responsáveis por invocá-los.</p>
+            <div class="tabela-codons-grid" id="tabela-codons-grid">
+                <!-- Preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL INFORMAÇÃO DO GENE (POP-UP) -->
+    <div class="modal-overlay" id="modal-info-gene">
+        <div class="modal-content modal-content-small" onclick="event.stopPropagation();">
+            <h2 id="modal-gene-titulo">Título do Gene</h2>
+            <p id="modal-gene-texto">Informação sobre a função fisiológica deste gene aparecerá aqui.</p>
+            <button class="btn-fechar-modal-central" onclick="fecharModalInfoGene()">Entendido</button>
+        </div>
+    </div>
+
+    <script>
+        // =========================================
+        // NAVEGAÇÃO DE INTERFACES E MODAL UX
+        // =========================================
+        function abrirInterface(tipo) {
+            document.getElementById('interface-teoria').classList.add('escondido');
+            document.getElementById('interface-mutacao').classList.add('escondido');
+            document.getElementById('interface-eletroforese').classList.add('escondido');
+
+            if (tipo === 'teoria') { document.getElementById('interface-teoria').classList.remove('escondido'); } 
+            else if (tipo === 'mutacao') { 
+                document.getElementById('interface-mutacao').classList.remove('escondido'); 
+                if(dnaSequencia.length === 0) mudarCenarioGene(false); 
+                else renderMutationEditor(); 
+            } 
+            else if (tipo === 'eletroforese') { document.getElementById('interface-eletroforese').classList.remove('escondido'); if(!casoAtual) carregarCasoAleatorio(); }
+        }
+
+        const modalOverlay = document.getElementById('modal-codons');
+        function abrirModalCodons() { modalOverlay.style.display = 'flex'; document.body.classList.add('modal-aberto'); }
+        function fecharModalCodons() { modalOverlay.style.display = 'none'; document.body.classList.remove('modal-aberto'); }
+        modalOverlay.addEventListener('click', function(event) { if (event.target === modalOverlay) fecharModalCodons(); });
+
+        const modalInfoGene = document.getElementById('modal-info-gene');
+        function abrirModalInfoGene(titulo, texto) {
+            document.getElementById('modal-gene-titulo').innerText = titulo;
+            document.getElementById('modal-gene-texto').innerText = texto;
+            modalInfoGene.style.display = 'flex';
+            document.body.classList.add('modal-aberto');
+        }
+        function fecharModalInfoGene() {
+            modalInfoGene.style.display = 'none';
+            document.body.classList.remove('modal-aberto');
+        }
+        modalInfoGene.addEventListener('click', function(event) { if (event.target === modalInfoGene) fecharModalInfoGene(); });
+
+        // =========================================
+        // SCROLL SINCRONIZADO
+        // =========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const scrollDna = document.getElementById('scroll-dna');
+            const scrollRna = document.getElementById('scroll-rna');
+            const scrollProt = document.getElementById('scroll-prot');
+
+            function syncScroll(e) {
+                const sl = e.target.scrollLeft;
+                if (scrollDna && scrollDna !== e.target && scrollDna.scrollLeft !== sl) scrollDna.scrollLeft = sl;
+                if (scrollRna && scrollRna !== e.target && scrollRna.scrollLeft !== sl) scrollRna.scrollLeft = sl;
+                if (scrollProt && scrollProt !== e.target && scrollProt.scrollLeft !== sl) scrollProt.scrollLeft = sl;
+            }
+
+            if(scrollDna) scrollDna.addEventListener('scroll', syncScroll);
+            if(scrollRna) scrollRna.addEventListener('scroll', syncScroll);
+            if(scrollProt) scrollProt.addEventListener('scroll', syncScroll);
+        });
+
+        // =========================================
+        // DICIONÁRIOS DE DADOS E CÓDONS
+        // =========================================
+        const aaNomes = {
+            'Ala': 'Alanina', 'Arg': 'Arginina', 'Asn': 'Asparagina', 'Asp': 'Ácido Aspártico',
+            'Cys': 'Cisteína', 'Gln': 'Glutamina', 'Glu': 'Ácido Glutâmico', 'Gly': 'Glicina',
+            'His': 'Histidina', 'Ile': 'Isoleucina', 'Leu': 'Leucina', 'Lys': 'Lisina',
+            'Met': 'Metionina (START)', 'Phe': 'Fenilalanina', 'Pro': 'Prolina', 'Ser': 'Serina',
+            'Thr': 'Treonina', 'Trp': 'Triptofano', 'Tyr': 'Tirosina', 'Val': 'Valina', 'STOP': 'Sinal de Parada'
+        };
+
+        const rnaCodonMap = {
+            'UUU': 'Phe', 'UUC': 'Phe', 'UUA': 'Leu', 'UUG': 'Leu', 'CUU': 'Leu', 'CUC': 'Leu', 'CUA': 'Leu', 'CUG': 'Leu',
+            'AUU': 'Ile', 'AUC': 'Ile', 'AUA': 'Ile', 'AUG': 'Met', 'GUU': 'Val', 'GUC': 'Val', 'GUA': 'Val', 'GUG': 'Val',
+            'UCU': 'Ser', 'UCC': 'Ser', 'UCA': 'Ser', 'UCG': 'Ser', 'CCU': 'Pro', 'CCC': 'Pro', 'CCA': 'Pro', 'CCG': 'Pro',
+            'ACU': 'Thr', 'ACC': 'Thr', 'ACA': 'Thr', 'ACG': 'Thr', 'GCU': 'Ala', 'GCC': 'Ala', 'GCA': 'Ala', 'GCG': 'Ala',
+            'UAU': 'Tyr', 'UAC': 'Tyr', 'UAA': 'STOP', 'UAG': 'STOP', 'CAU': 'His', 'CAC': 'His', 'CAA': 'Gln', 'CAG': 'Gln',
+            'AAU': 'Asn', 'AAC': 'Asn', 'AAA': 'Lys', 'AAG': 'Lys', 'GAU': 'Asp', 'GAC': 'Asp', 'GAA': 'Glu', 'GAG': 'Glu',
+            'UGU': 'Cys', 'UGC': 'Cys', 'UGA': 'STOP', 'UGG': 'Trp', 'CGU': 'Arg', 'CGC': 'Arg', 'CGA': 'Arg', 'CGG': 'Arg',
+            'AGU': 'Ser', 'AGC': 'Ser', 'AGA': 'Arg', 'AGG': 'Arg', 'GGU': 'Gly', 'GGC': 'Gly', 'GGA': 'Gly', 'GGG': 'Gly'
+        };
+
+        function popularEnciclopedia() {
+            const grid = document.getElementById('tabela-codons-grid');
+            grid.innerHTML = '';
+            let grupos = {};
+            for (const [codon, sigla] of Object.entries(rnaCodonMap)) {
+                if(!grupos[sigla]) grupos[sigla] = [];
+                grupos[sigla].push(codon);
+            }
+            for (const [sigla, codons] of Object.entries(grupos)) {
+                const card = document.createElement('div');
+                card.className = 'aa-group-card';
+                if(sigla === 'STOP') card.classList.add('stop-card');
+                if(sigla === 'Met') card.classList.add('start-card');
+                const nomeCompleto = aaNomes[sigla] || 'Desconhecido';
+                let htmlCodons = codons.map(c => `<span class="codon-badge">${c}</span>`).join('');
+                card.innerHTML = `<div class="aa-group-header"><span>${nomeCompleto}</span><span>${sigla}</span></div><div class="aa-group-body">${htmlCodons}</div>`;
+                grid.appendChild(card);
+            }
+        }
+
+        // =========================================
+        // MOTOR DE CENÁRIOS GÊNICOS
+        // =========================================
+        function gerarLaudoGenerico(proteina, stopPrematuro, isFrameshift, rnaArray, wildTypeProteina, wildTypeRNA) {
+            if (isFrameshift) {
+                return { 
+                    status: "frameshift", targetHit: false, titulo: "Matriz Quebrada (Frameshift)", 
+                    texto: "A deleção de uma base empurrou toda a matriz de leitura. Todos os aminoácidos subsequentes foram alterados ou a proteína foi cortada precocemente. A estrutura original foi totalmente destruída." 
+                };
+            }
+            
+            let posErro = -1;
+            if (stopPrematuro) {
+                for (let i = 0; i < wildTypeProteina.length; i++) {
+                    let trinca = rnaArray.slice(i*3, i*3+3).join('');
+                    if (rnaCodonMap[trinca] === 'STOP') { posErro = i; break; }
+                }
+                let oldCodon = wildTypeRNA[posErro] || "N/A";
+                let newCodon = rnaArray.slice(posErro*3, posErro*3+3).join('');
+                return { 
+                    status: "nonsense", targetHit: false, titulo: "Proteína Truncada (Nonsense)", 
+                    texto: `O sistema detectou um STOP prematuro no códon ${posErro+1} (${oldCodon} convertido para ${newCodon}). Independente da doença que procurávamos, a proteína nasceu cortada e foi destruída pela célula.` 
+                };
+            } else {
+                for (let i = 0; i < wildTypeProteina.length; i++) {
+                    let trinca = rnaArray.slice(i*3, i*3+3).join('');
+                    let sigla = rnaCodonMap[trinca];
+                    if (sigla !== wildTypeProteina[i] && sigla !== 'STOP') { posErro = i; break; }
+                }
+                if(posErro !== -1) {
+                    let oldCodon = wildTypeRNA[posErro] || "N/A";
+                    let newCodon = rnaArray.slice(posErro*3, posErro*3+3).join('');
+                    let oldAA = wildTypeProteina[posErro];
+                    let newAA = rnaCodonMap[newCodon];
+                    return { 
+                        status: "missense", targetHit: false, titulo: "Variante de Significado Incerto (Missense)", 
+                        texto: `Você causou uma mutação não catalogada no códon ${posErro+1} (${oldAA} trocado por ${newAA}). Essa alteração muda o dobramento local da proteína. Classificada como Variante Genética de Significado Incerto.` 
+                    };
+                }
+            }
+            return { status: "erro", targetHit: false, titulo: "Erro de Análise", texto: "Não foi possível analisar a cadeia." };
+        }
+
+        const cenariosMutacao = {
+            'padrao': {
+                id: 'padrao', tituloMissao: 'Treinamento de Bancada',
+                fonte: 'A sequência abaixo é fictícia e aberta, criada especificamente para treinamento de laboratório.',
+                infoTitulo: 'Ambiente de Laboratório Aberto',
+                infoTexto: 'Você selecionou o Cenário Didático Livre. Ele não representa um gene real, mas sim um ambiente de simulação aberto para você testar como as letras do DNA (A, T, C, G) se transformam em aminoácidos na prática.',
+                desc: 'Altere as bases livremente e veja como a tabela de códons se comporta na prática. Entenda como criar um STOP, como trocar aminoácidos e como funciona o Frameshift (Deleção).',
+                wildTypeDNA: ['A','T','G', 'C','C','A', 'T','G','G', 'T','A','A'], 
+                wildTypeRNA: ['AUG', 'CCA', 'UGG', 'UAA'],
+                wildTypeProteina: ['Met', 'Pro', 'Trp', 'STOP'],
+                avaliar: function(proteina, stopPrematuro, isFrameshift, rnaArray) {
+                    let rnaIgual = rnaArray.join('') === this.wildTypeRNA.join('');
+                    let protIgual = proteina.length === this.wildTypeProteina.length && proteina.every((v, i) => v === this.wildTypeProteina[i]);
+                    
+                    if (isFrameshift) return { status: "frameshift", targetHit: true, titulo: "Mutação Frameshift (Deslocamento)", texto: "A deleção mudou a matriz de leitura. A proteína resultante é completamente diferente da original." };
+                    else if (stopPrematuro) return { status: "nonsense", targetHit: true, titulo: "Proteína Truncada (Inativa)", texto: "O códon de parada prematuro abortou a tradução. A proteína nasceu pela metade." };
+                    else if (protIgual && !rnaIgual) return { status: "silenciosa", targetHit: true, titulo: "Mutação Silenciosa Detectada", texto: "Você trocou uma letra do DNA, mas a tabela de códons puxou o exato mesmo aminoácido. A proteína não sofreu alteração clínica." };
+                    else if (protIgual && rnaIgual) return { status: "funcional", targetHit: false, titulo: "Proteína Funcional (Selvagem)", texto: "Nenhuma mutação foi feita. A sequência gerou a estrutura exata da proteína original." };
+                    else return { status: "missense", targetHit: true, titulo: "Mutação Missense (Troca)", texto: "A troca de um ou mais aminoácidos alterou a forma 3D genérica desta proteína." };
+                }
+            },
+            'cftr': {
+                id: 'cftr', tituloMissao: 'Caso Clínico: O Muco Pulmonar',
+                fonte: 'A sequência abaixo é um trecho adaptado do éxon 12 do gene humano CFTR (Locus 7q31.2), simplificado para fins didáticos.',
+                infoTitulo: 'Gene CFTR (Cromossomo 7)',
+                infoTexto: 'Você selecionou o gene CFTR. Ele contém as instruções para produzir um canal celular que transporta íons de cloro e água, essencial para manter o muco dos pulmões e órgãos digestivos fluido e saudável.',
+                desc: 'O paciente chegou com acúmulo de muco pulmonar espesso e infecções severas. A mutação G542X é severa e cria um STOP codon prematuro (Nonsense). Altere a 1ª base do 5º códon de G para T (GGA → TGA) para observar a produção do canal de cloro ser abortada.',
+                wildTypeDNA: ['A','T','G', 'A','T','T', 'G','A','A', 'C','A','A', 'G','G','A', 'A','G','A', 'T','C','C', 'T','A','A'], 
+                wildTypeRNA: ['AUG', 'AUU', 'GAA', 'CAA', 'GGA', 'AGA', 'UCC', 'UAA'],
+                wildTypeProteina: ['Met', 'Ile', 'Glu', 'Gln', 'Gly', 'Arg', 'Ser', 'STOP'],
+                avaliar: function(proteina, stopPrematuro, isFrameshift, rnaArray) {
+                    let rnaIgual = rnaArray.join('') === this.wildTypeRNA.join('');
+                    let protIgual = proteina.length === this.wildTypeProteina.length && proteina.every((v, i) => v === this.wildTypeProteina[i]);
+
+                    if (protIgual && !isFrameshift) {
+                        if (rnaIgual) return { status: "funcional", targetHit: false, titulo: "Canal de Cloro Funcional", texto: "O canal CFTR foi construído perfeitamente. O muco pulmonar é fluido e a troca de íons está saudável." };
+                        else return { status: "silenciosa", targetHit: false, titulo: "Mutação Silenciosa (Canal Funcional)", texto: "A alteração na base de DNA gerou um RNA diferente, mas que codifica o exato mesmo aminoácido. A estrutura primária continuou perfeita. O paciente continuará saudável." };
+                    }
+                    if (stopPrematuro && !isFrameshift) {
+                        if (proteina.length === 5 && proteina[4] === 'STOP') {
+                            let cascata = `<div class="cascata-doenca"><b>A Cascata da Doença:</b> Mutação Nonsense no CFTR > Proteína truncada (produção abortada) > Falta do canal de Cloro na membrana celular > Água não flui para fora da célula > Muco pulmonar fica espesso e pegajoso > Infecções respiratórias severas.</div>`;
+                            return { status: "nonsense", targetHit: true, titulo: "Fibrose Cística Clássica (Mutação G542X)", texto: "Você encontrou o erro exato do paciente. A mutação Nonsense no códon 5 abortou a produção do canal de Cloro." + cascata };
+                        }
+                    }
+                    return gerarLaudoGenerico(proteina, stopPrematuro, isFrameshift, rnaArray, this.wildTypeProteina, this.wildTypeRNA);
+                }
+            },
+            'hbb': {
+                id: 'hbb', tituloMissao: 'Caso Clínico: Anemia Falciforme',
+                fonte: 'A sequência abaixo é um trecho adaptado do éxon 1 do gene humano HBB (Locus 11p15.4), simplificado para fins didáticos.',
+                infoTitulo: 'Gene HBB (Cromossomo 11)',
+                infoTexto: 'Você selecionou o gene HBB. Ele contém as instruções para produzir a cadeia beta da hemoglobina, a proteína responsável por transportar o oxigênio dentro das hemácias (glóbulos vermelhos) no sangue.',
+                desc: 'Na vida real, a Metionina inicial é removida na maturação da proteína. O 7º códon abaixo representa a famosa <b>posição 6</b> da cadeia beta-globina. Troque a base central de A para T (GAG → GTG) para criar a Valina, causadora da Anemia Falciforme.',
+                wildTypeDNA: ['A','T','G', 'G','T','G', 'C','A','C', 'C','T','G', 'A','C','T', 'C','C','T', 'G','A','G', 'T','A','A'], 
+                wildTypeRNA: ['AUG', 'GUG', 'CAC', 'CUG', 'ACU', 'CCU', 'GAG', 'UAA'],
+                wildTypeProteina: ['Met', 'Val', 'His', 'Leu', 'Thr', 'Pro', 'Glu', 'STOP'],
+                avaliar: function(proteina, stopPrematuro, isFrameshift, rnaArray) {
+                    let rnaIgual = rnaArray.join('') === this.wildTypeRNA.join('');
+                    let protIgual = proteina.length === this.wildTypeProteina.length && proteina.every((v, i) => v === this.wildTypeProteina[i]);
+
+                    if (protIgual && !isFrameshift) {
+                        if (rnaIgual) return { status: "funcional", targetHit: false, titulo: "Hemoglobina Normal (HbA)", texto: "A sequência formou o Ácido Glutâmico (Glu) na posição correta. A hemoglobina transporta oxigênio com máxima eficiência." };
+                        else return { status: "silenciosa", targetHit: false, titulo: "Mutação Silenciosa (HbA Funcional)", texto: "A troca de bases não alterou o aminoácido. A hemoglobina continua normal e transportará oxigênio perfeitamente." };
+                    } 
+
+                    if (!stopPrematuro && !isFrameshift && proteina[6] === 'Val') {
+                        let cascata = `<div class="cascata-doenca"><b>A Cascata da Doença:</b> Mutação Missense no HBB > Ácido Glutâmico substituído por Valina > Hemoglobina alterada se polimeriza > Hemácia se deforma para formato de foice > Menor transporte de oxigênio > Dor, anemia severa e obstrução dos vasos capilares.</div>`;
+                        return { status: "missense", targetHit: true, titulo: "Anemia Falciforme (HbS)", texto: "Missão Cumprida! A troca de Glu por Valina criou um ponto pegajoso hidrofóbico na molécula da hemoglobina." + cascata };
+                    }
+                    if (!stopPrematuro && !isFrameshift && proteina[6] === 'Lys') {
+                        let cascata = `<div class="cascata-doenca"><b>A Cascata da Doença:</b> Mutação Missense no HBB > Ácido Glutâmico substituído por Lisina > Hemoglobina perde a solubilidade > Formação de cristais dentro do glóbulo vermelho > Destruição precoce das hemácias > Anemia hemolítica.</div>`;
+                        return { status: "missense", targetHit: true, titulo: "Doença da Hemoglobina C (HbC)", texto: "Segredo Encontrado! A troca de Glu por Lisina (Lys) faz com que a hemoglobina forme cristais danosos dentro da hemácia." + cascata };
+                    }
+                    
+                    return gerarLaudoGenerico(proteina, stopPrematuro, isFrameshift, rnaArray, this.wildTypeProteina, this.wildTypeRNA);
+                }
+            },
+            'pah': {
+                id: 'pah', tituloMissao: 'Caso Clínico: Acúmulo Toxicológico',
+                fonte: 'A sequência abaixo é um trecho adaptado do éxon 12 do gene humano PAH (Locus 12q23.2), simplificado para fins didáticos.',
+                infoTitulo: 'Gene PAH (Cromossomo 12)',
+                infoTexto: 'Você selecionou o gene PAH. Ele contém as instruções para produzir a Fenilalanina Hidroxilase, uma enzima hepática crucial que quebra toxinas metabólicas antes que elas atinjam o cérebro.',
+                desc: 'A mutação R408W inativa a enzima hepática. Transforme a Arginina (Arg) em Triptofano (Trp) trocando a 1ª base do 4º códon de C para T (CGG → TGG).',
+                wildTypeDNA: ['A','T','G', 'A','T','C', 'G','C','C', 'C','G','G', 'C','T','C', 'T','C','C', 'A','C','T', 'T','A','A'], 
+                wildTypeRNA: ['AUG', 'AUC', 'GCC', 'CGG', 'CUC', 'UCC', 'ACU', 'UAA'],
+                wildTypeProteina: ['Met', 'Ile', 'Ala', 'Arg', 'Leu', 'Ser', 'Thr', 'STOP'],
+                avaliar: function(proteina, stopPrematuro, isFrameshift, rnaArray) {
+                    let rnaIgual = rnaArray.join('') === this.wildTypeRNA.join('');
+                    let protIgual = proteina.length === this.wildTypeProteina.length && proteina.every((v, i) => v === this.wildTypeProteina[i]);
+
+                    if (protIgual && !isFrameshift) {
+                        if (rnaIgual) return { status: "funcional", targetHit: false, titulo: "Enzima PAH Funcional", texto: "A estrutura primária está perfeita. A enzima metaboliza a fenilalanina sem problemas. O bebê estaria saudável." };
+                        else return { status: "silenciosa", targetHit: false, titulo: "Mutação Silenciosa (Enzima PAH Intacta)", texto: "A letra do DNA mudou, mas o aminoácido continuou o mesmo. A enzima PAH se dobrou corretamente e metabolizará toxinas sem causar doença." };
+                    } 
+                    if (!stopPrematuro && !isFrameshift && proteina[3] === 'Trp') {
+                        let cascata = `<div class="cascata-doenca"><b>A Cascata da Doença:</b> Mutação Missense no PAH > Arginina substituída por Triptofano > Enzima do fígado perde o formato do Sítio Ativo > Falha na quebra da Fenilalanina > Acúmulo de toxinas no sangue > Danos neurológicos sistêmicos.</div>`;
+                        return { status: "missense", targetHit: true, titulo: "Fenilcetonúria Clássica (Mutação R408W)", texto: "Alvo encontrado. Você simulou a mutação Missense mais famosa desta patologia." + cascata };
+                    }
+                    return gerarLaudoGenerico(proteina, stopPrematuro, isFrameshift, rnaArray, this.wildTypeProteina, this.wildTypeRNA);
+                }
+            },
+            'fgfr3': {
+                id: 'fgfr3', tituloMissao: 'Caso Clínico: O Receptor Ósseo',
+                fonte: 'A sequência abaixo é um trecho adaptado do éxon 10 do gene humano FGFR3 (Locus 4p16.3), simplificado para fins didáticos.',
+                infoTitulo: 'Gene FGFR3 (Cromossomo 4)',
+                infoTexto: 'Você selecionou o gene FGFR3. Ele contém as instruções para produzir um receptor celular que controla o crescimento dos ossos e das cartilagens, funcionando como um freio natural do desenvolvimento ósseo.',
+                desc: 'A mutação G380R superativa o receptor ósseo, causando nanismo. Transforme a Glicina (Gly) em Arginina (Arg) trocando a 1ª base do 4º códon de G para A ou C (GGG → AGG ou CGG).',
+                wildTypeDNA: ['A','T','G', 'T','A','C', 'G','C','C', 'G','G','G', 'T','C','A', 'C','T','G', 'G','T','C', 'T','A','A'], 
+                wildTypeRNA: ['AUG', 'UAC', 'GCC', 'GGG', 'UCA', 'CUG', 'GUC', 'UAA'],
+                wildTypeProteina: ['Met', 'Tyr', 'Ala', 'Gly', 'Ser', 'Leu', 'Val', 'STOP'],
+                avaliar: function(proteina, stopPrematuro, isFrameshift, rnaArray) {
+                    let rnaIgual = rnaArray.join('') === this.wildTypeRNA.join('');
+                    let protIgual = proteina.length === this.wildTypeProteina.length && proteina.every((v, i) => v === this.wildTypeProteina[i]);
+
+                    if (protIgual && !isFrameshift) {
+                        if (rnaIgual) return { status: "funcional", targetHit: false, titulo: "Receptor FGFR3 Normal", texto: "O receptor celular foi construído corretamente. O crescimento das cartilagens e ossos longos operam de forma controlada." };
+                        else return { status: "silenciosa", targetHit: false, titulo: "Mutação Silenciosa (Receptor FGFR3 Normal)", texto: "Apesar da mutação no DNA, o receptor ósseo recebeu os mesmos aminoácidos. O crescimento continuará de forma natural, sem causar acondroplasia." };
+                    } 
+                    if (!stopPrematuro && !isFrameshift && proteina[3] === 'Arg') {
+                        let cascata = `<div class="cascata-doenca"><b>A Cascata da Doença:</b> Mutação Missense no FGFR3 > Glicina substituída por Arginina > Receptor ósseo fica superativado (travado na posição ligado) > Sinais excessivos mandam a cartilagem parar de crescer prematuramente > Ossos curtos e desenvolvimento desproporcional.</div>`;
+                        return { status: "missense", targetHit: true, titulo: "Acondroplasia (Mutação G380R)", texto: "Alvo atingido. A troca da Glicina por Arginina faz com que o receptor FGFR3 fique hiperativo." + cascata };
+                    }
+                    return gerarLaudoGenerico(proteina, stopPrematuro, isFrameshift, rnaArray, this.wildTypeProteina, this.wildTypeRNA);
+                }
+            },
+            'dmd': {
+                id: 'dmd', tituloMissao: 'Caso Clínico: A Falha na Matriz',
+                fonte: 'A sequência abaixo é um trecho adaptado do gene humano DMD (Locus Xp21.2-p21.1), simplificado para fins didáticos.',
+                infoTitulo: 'Gene DMD (Cromossomo X)',
+                infoTexto: 'Você selecionou o gene DMD. Ele contém as instruções para produzir a Distrofina, a maior proteína do corpo humano, que age como um amortecedor vital para proteger as fibras musculares durante a contração. Embora ~65% dos casos de Duchenne sejam causados por deleções gigantescas de éxons inteiros, cerca de 25% dos casos ocorrem por MICRO-deleções. É isso que simularemos aqui.',
+                desc: 'Vamos simular uma micro-deleção patogênica clássica. Mude a ferramenta para "Deleção" e apague a 1ª base do 4º códon (C) para observar o efeito frameshift destruindo a leitura da proteína.',
+                wildTypeDNA: ['A','T','G', 'C','T','A', 'T','G','G', 'C','G','A', 'T','A','C', 'C','A','G', 'G','C','T', 'T','A','A'], 
+                wildTypeRNA: ['AUG', 'CUA', 'UGG', 'CGA', 'UAC', 'CAG', 'GCU', 'UAA'],
+                wildTypeProteina: ['Met', 'Leu', 'Trp', 'Arg', 'Tyr', 'Gln', 'Ala', 'STOP'],
+                avaliar: function(proteina, stopPrematuro, isFrameshift, rnaArray) {
+                    let rnaIgual = rnaArray.join('') === this.wildTypeRNA.join('');
+                    let protIgual = proteina.length === this.wildTypeProteina.length && proteina.every((v, i) => v === this.wildTypeProteina[i]);
+
+                    if (protIgual && !isFrameshift) {
+                        if (rnaIgual) return { status: "funcional", targetHit: false, titulo: "Distrofina Muscular Intacta", texto: "A proteína Distrofina foi traduzida por completo. Ela age como um amortecedor, protegendo a fibra muscular do desgaste." };
+                        else return { status: "silenciosa", targetHit: false, titulo: "Mutação Silenciosa (Distrofina Intacta)", texto: "Você causou uma mutação silenciosa. A gigantesca proteína distrofina foi construída com as peças corretas e o músculo do paciente continuará protegido." };
+                    } 
+                    if (isFrameshift) {
+                        let cascata = `<div class="cascata-doenca"><b>A Cascata da Doença:</b> Micro-deleção de Nucleotídeo > Matriz de leitura sofre Frameshift > Todos os aminoácidos seguintes mudam > Proteína Distrofina torna-se lixo celular e é destruída > Fibras musculares ficam sem amortecimento > Músculo se rasga e degenera a cada contração > Fraqueza muscular severa.</div>`;
+                        return { status: "frameshift", targetHit: true, titulo: "Distrofia de Duchenne (Micro-deleção)", texto: "Missão cumprida. A remoção de uma única base embaralhou toda a matriz de leitura e inativou o gene." + cascata };
+                    }
+                    return gerarLaudoGenerico(proteina, stopPrematuro, isFrameshift, rnaArray, this.wildTypeProteina, this.wildTypeRNA);
+                }
+            }
+        };
+
+        let cenarioAtual = null;
+        let dnaSequencia = [];
+        let rnaAtual = [];
+        let proteinaAtual = [];
+        let stopPrematuroGeral = false;
+        let frameshiftDetectado = false;
+        let ultimaBaseMutada = -1; 
+
+        function mudarCenarioGene(mostrarPopup = true) {
+            const geneId = document.getElementById('select-gene').value;
+            cenarioAtual = cenariosMutacao[geneId];
+            
+            dnaSequencia = [...cenarioAtual.wildTypeDNA];
+            document.getElementById('titulo-missao').innerHTML = cenarioAtual.tituloMissao;
+            document.getElementById('desc-missao').innerHTML = cenarioAtual.desc;
+            document.getElementById('missao-concluida').style.display = 'none';
+            document.getElementById('resultado-ensaio').classList.add('escondido');
+            document.getElementById('alert-mutacao').classList.add('escondido');
+            document.getElementById('fonte-gene').innerText = cenarioAtual.fonte;
+            
+            document.querySelector('input[value="sub"]').checked = true;
+            ultimaBaseMutada = -1;
+            atualizarEstiloBases();
+            
+            renderMutationEditor();
+            
+            if (mostrarPopup) {
+                abrirModalInfoGene(cenarioAtual.infoTitulo, cenarioAtual.infoTexto);
+            }
+        }
+
+        function restaurarDNA() {
+            dnaSequencia = [...cenarioAtual.wildTypeDNA];
+            document.getElementById('resultado-ensaio').classList.add('escondido');
+            document.getElementById('missao-concluida').style.display = 'none';
+            ultimaBaseMutada = -1;
+            renderMutationEditor();
+        }
+
+        function atualizarEstiloBases() {
+            const isDel = document.querySelector('input[name="modo-mutacao"]:checked').value === 'del';
+            const bases = document.querySelectorAll('.nucleotide');
+            bases.forEach(b => {
+                if (isDel) b.classList.add('modo-del');
+                else b.classList.remove('modo-del');
+            });
+        }
+
+        function renderMutationEditor() {
+            const dnaContainer = document.getElementById('dna-container');
+            const rnaContainer = document.getElementById('rna-container');
+            dnaContainer.innerHTML = '';
+            rnaContainer.innerHTML = '';
+            rnaAtual = []; 
+
+            const isDelMode = document.querySelector('input[name="modo-mutacao"]:checked').value === 'del';
+
+            dnaSequencia.forEach((base, index) => {
+                const spanDNA = document.createElement('span');
+                spanDNA.className = 'nucleotide';
+                if (isDelMode) spanDNA.classList.add('modo-del');
+                
+                if (index === ultimaBaseMutada) {
+                    spanDNA.classList.add('flash-verde');
+                }
+                
+                spanDNA.innerText = base;
+                spanDNA.onclick = () => { mutate(index); };
+                
+                let baseRNA = (base === 'T') ? 'U' : base;
+                rnaAtual.push(baseRNA);
+                
+                const spanRNA = document.createElement('span');
+                spanRNA.className = 'rna-nucleotide';
+                spanRNA.innerText = baseRNA;
+
+                if ((index + 1) % 3 === 0 && index !== dnaSequencia.length - 1) {
+                    spanDNA.style.marginRight = '25px';
+                    spanRNA.style.marginRight = '25px';
+                }
+
+                dnaContainer.appendChild(spanDNA);
+                rnaContainer.appendChild(spanRNA);
+            });
+
+            ultimaBaseMutada = -1; 
+
+            traduzirProteina(rnaAtual);
+        }
+
+        function mutate(index) {
+            document.getElementById('resultado-ensaio').classList.add('escondido'); 
+            document.getElementById('missao-concluida').style.display = 'none';
+            
+            const modo = document.querySelector('input[name="modo-mutacao"]:checked').value;
+
+            if (modo === 'sub') {
+                const bases = ['A', 'T', 'C', 'G'];
+                let currentBase = dnaSequencia[index];
+                let nextBase = bases[(bases.indexOf(currentBase) + 1) % 4];
+                dnaSequencia[index] = nextBase;
+                ultimaBaseMutada = index; 
+            } else if (modo === 'del') {
+                dnaSequencia.splice(index, 1);
+                // O efeito da deleção: A letra "nova" que assumiu a posição index vai piscar para indicar o frameshift
+                ultimaBaseMutada = dnaSequencia.length > 0 ? Math.min(index, dnaSequencia.length - 1) : -1; 
+            }
+            
+            renderMutationEditor();
+        }
+
+        function traduzirProteina(rnaArray) {
+            const protContainer = document.getElementById('protein-container');
+            const alertMutacao = document.getElementById('alert-mutacao');
+            protContainer.innerHTML = '';
+            proteinaAtual = []; 
+            
+            let stopLido = false;
+            stopPrematuroGeral = false; 
+            frameshiftDetectado = dnaSequencia.length < cenarioAtual.wildTypeDNA.length;
+
+            for (let i = 0; i < rnaArray.length; i += 3) {
+                const codon = rnaArray.slice(i, i+3).join('');
+                
+                if (codon.length < 3) {
+                    const div = document.createElement('div');
+                    div.className = 'aa-card incomplete-codon';
+                    div.innerText = codon + '-?';
+                    div.setAttribute('data-fullname', 'Matriz Quebrada (Frameshift)');
+                    protContainer.appendChild(div);
+                    break;
+                }
+
+                const sigla = rnaCodonMap[codon] || '???';
+                const nomeCompleto = aaNomes[sigla] || 'Aminoácido Desconhecido';
+                
+                const div = document.createElement('div');
+                div.className = 'aa-card';
+                div.setAttribute('data-fullname', nomeCompleto);
+                if (i + 3 < rnaArray.length) div.style.marginRight = '25px';
+                
+                if (sigla === 'STOP') {
+                    div.classList.add('stop-codon');
+                    if(!stopLido) proteinaAtual.push(sigla); 
+                    stopLido = true;
+                    if (i < rnaArray.length - 3) stopPrematuroGeral = true;
+                } else {
+                    if(!stopLido) proteinaAtual.push(sigla); 
+                }
+                
+                div.innerText = sigla;
+
+                if (stopLido && sigla !== 'STOP') {
+                    div.style.opacity = '0.3';
+                    div.style.borderColor = 'transparent';
+                    div.setAttribute('data-fullname', 'Não traduzido (Ribossomo desconectado)');
+                }
+
+                protContainer.appendChild(div);
+            }
+
+            if (frameshiftDetectado) {
+                alertMutacao.innerHTML = "<strong>Alerta de Frameshift.</strong> A matriz de leitura perdeu a sincronia. Teste a função abaixo.";
+                alertMutacao.style.background = "#F4ECF7"; alertMutacao.style.color = "#4A235A"; alertMutacao.style.borderLeft = "4px solid #8E44AD";
+                alertMutacao.classList.remove('escondido');
+            } else if (stopPrematuroGeral) {
+                alertMutacao.innerHTML = "<strong>Mutação Nonsense.</strong> Sinal de PARADA antes da hora. Teste a função abaixo.";
+                alertMutacao.style.background = "#FADBD8"; alertMutacao.style.color = "#78281F"; alertMutacao.style.borderLeft = "4px solid #E74C3C";
+                alertMutacao.classList.remove('escondido');
+            } else if (stopLido) {
+                alertMutacao.innerHTML = "<strong>Fim da Tradução.</strong> O ribossomo leu até um sinal de STOP com sucesso.";
+                alertMutacao.style.background = "#D5F5E3"; alertMutacao.style.color = "#186A3B"; alertMutacao.style.borderLeft = "4px solid #2ECC71";
+                alertMutacao.classList.remove('escondido');
+            } else {
+                alertMutacao.classList.add('escondido');
+            }
+        }
+
+        function testarFuncaoProteica() {
+            const caixaResult = document.getElementById('resultado-ensaio');
+            const caixaMissao = document.getElementById('missao-concluida');
+            caixaResult.classList.remove('escondido');
+
+            let laudo = cenarioAtual.avaliar(proteinaAtual, stopPrematuroGeral, frameshiftDetectado, rnaAtual);
+            
+            if (laudo.targetHit) {
+                caixaMissao.style.display = 'block';
+            } else {
+                caixaMissao.style.display = 'none';
+            }
+
+            if (laudo.status === "funcional") {
+                caixaResult.innerHTML = `<strong>Laudo Clínico: ${laudo.titulo}</strong><br><br>${laudo.texto}`;
+                caixaResult.style.background = "#D5F5E3"; caixaResult.style.color = "#186A3B"; caixaResult.style.border = "1px solid #2ECC71";
+            } 
+            else if (laudo.status === "silenciosa") {
+                caixaResult.innerHTML = `<strong>Laudo Clínico: ${laudo.titulo}</strong><br><br>${laudo.texto}`;
+                caixaResult.style.background = "#EBF5FB"; caixaResult.style.color = "#2874A6"; caixaResult.style.border = "1px solid #5DADE2";
+            }
+            else if (laudo.status === "nonsense") {
+                caixaResult.innerHTML = `<strong>Laudo Clínico: ${laudo.titulo}</strong><br><br>${laudo.texto}`;
+                caixaResult.style.background = "#FADBD8"; caixaResult.style.color = "#78281F"; caixaResult.style.border = "1px solid #E74C3C";
+            } 
+            else if (laudo.status === "missense") {
+                caixaResult.innerHTML = `<strong>Laudo Clínico: ${laudo.titulo}</strong><br><br>${laudo.texto}`;
+                caixaResult.style.background = "#FCF3CF"; caixaResult.style.color = "#7D6608"; caixaResult.style.border = "1px solid #F1C40F";
+            }
+            else if (laudo.status === "frameshift") {
+                caixaResult.innerHTML = `<strong>Laudo Clínico: ${laudo.titulo}</strong><br><br>${laudo.texto}`;
+                caixaResult.style.background = "#EBDEF0"; caixaResult.style.color = "#4A235A"; caixaResult.style.border = "1px solid #8E44AD";
+            }
+        }
+
+        // =========================================
+        // LÓGICA DA BANCADA 03 (ELETROFORESE CLÍNICA - APENAS PCR)
+        // =========================================
+        
+        const tamanhosCuba = [
+            { nome: 'Pequena', cm: 10, min: 50, max: 100 },
+            { nome: 'Média', cm: 15, min: 75, max: 150 },
+            { nome: 'Grande', cm: 20, min: 100, max: 200 }
+        ];
+        let cubaAtualObj = null;
+
+        // Banco de Casos Reduzido para 2 Pacientes (Foco e melhor responsividade)
+        const bancoDeCasos = [
+            { 
+                id: "#CF-1044", especialidade: "Pneumogenética", doenca: "Fibrose Cística", titulo_fam: "Investigação Genética", 
+                historico_fam: "Doença autossômica recessiva. O paciente Marcos nasceu com suspeita clínica severa e infecções de repetição. A mãe (Sofia), que não possui sintomas, veio ao laboratório com a criança para o mapeamento.",
+                p1_nome: "Marcos (Filho, 2 anos)", p1_desc: "Infecções pulmonares e muco espesso.", p1_curto: "MARCOS", 
+                p2_nome: "Sofia (Mãe, 31 anos)", p2_desc: "Assintomática. Realizando teste para aconselhamento familiar.", p2_curto: "SOFIA", 
+                mecanismo: "<b>PCR e Eletroforese de DNA.</b> A mutação F508del é uma deleção de bases. O gene mutante perdeu material genético, gerando um fragmento de DNA mais curto e leve que migra mais rápido (300bp). O gene selvagem é completo e mais pesado (400bp).", 
+                pistas: [
+                    { id: 'ladder', nome: 'Ladder', bandas: ['50px', '120px', '190px', '260px', '330px'] },
+                    { id: 'c_pos', nome: 'CTRL<br>(+)', bandas: ['190px'] },
+                    { id: 'c_neg', nome: 'CTRL<br>(-)', bandas: ['120px'] },
+                    { id: 'p1', nome: 'MARCOS', bandas: ['190px'] },
+                    { id: 'p2', nome: 'SOFIA', bandas: ['120px', '190px'] }
+                ],
+                laudo_p1: "positivo", laudo_p2: "portador",
+                feedback_laudo: "<b>Marcos (Positivo):</b> Herdou apenas os alelos deletados, apresentando a banda mutante (300bp).<br><b>Sofia (Portadora):</b> A mãe é heterozigota, possuindo o alelo saudável (400bp) e o mutado (300bp)." 
+            },
+            { 
+                id: "#DMD-310", especialidade: "Neuromuscular", doenca: "Distrofia Muscular de Duchenne", titulo_fam: "Investigação Genética", 
+                historico_fam: "Herança recessiva ligada ao Cromossomo X. A mãe (Clara) tem histórico de Duchenne na família e quer investigar o estado clínico de seu filho (Léo).",
+                p1_nome: "Léo (Filho, 5 anos)", p1_desc: "Dificuldade motora e fraqueza progressiva.", p1_curto: "LÉO", 
+                p2_nome: "Clara (Mãe, 35 anos)", p2_desc: "Assintomática. Histórico de tios que faleceram na infância.", p2_curto: "CLARA", 
+                mecanismo: "<b>PCR Multiplex e Eletroforese.</b> Testamos o padrão clássico de Duchenne: grandes deleções genômicas. O alelo saudável (X) é pesado (300bp). O mutante (x) perdeu éxons inteiros, ficando leve (100bp). O cromossomo Y não gera banda.", 
+                pistas: [
+                    { id: 'ladder', nome: 'Ladder', bandas: ['50px', '120px', '190px', '260px', '330px'] },
+                    { id: 'c_pos', nome: 'CTRL<br>(+)', bandas: ['330px'] },
+                    { id: 'c_neg', nome: 'CTRL<br>(-)', bandas: ['190px'] },
+                    { id: 'p1', nome: 'LÉO', bandas: ['330px'] },
+                    { id: 'p2', nome: 'CLARA', bandas: ['190px', '330px'] }
+                ],
+                laudo_p1: "positivo", laudo_p2: "portador",
+                feedback_laudo: "<b>Léo (Positivo):</b> Menino (XY) com o alelo mutante leve (100bp).<br><b>Clara (Portadora):</b> A mãe (Xx) apresenta a banda doente, mas a banda pesada saudável de 300bp a protege dos sintomas da doença." 
+            }
+        ];
+
+        let casoAtual = null; let preparoRealizado = false; let gelRodou = false;
+
+        function carregarCasoAleatorio() {
+            let novoCaso;
+            do { novoCaso = bancoDeCasos[Math.floor(Math.random() * bancoDeCasos.length)]; } 
+            while (casoAtual && novoCaso.id === casoAtual.id && bancoDeCasos.length > 1);
+            
+            casoAtual = novoCaso;
+            
+            cubaAtualObj = tamanhosCuba[Math.floor(Math.random() * tamanhosCuba.length)];
+            document.getElementById('ui-cuba-info').innerHTML = `Cuba <b>${cubaAtualObj.nome} (${cubaAtualObj.cm} cm)</b> configurada.`;
+
+            document.getElementById('ui-id-prontuario').innerText = casoAtual.id;
+            document.getElementById('ui-especialidade').innerText = casoAtual.especialidade;
+            document.getElementById('ui-doenca-badge').innerText = casoAtual.doenca;
+            document.getElementById('ui-titulo-familia').innerText = casoAtual.titulo_fam;
+            document.getElementById('ui-historico-fam').innerText = casoAtual.historico_fam;
+            
+            document.getElementById('ui-label-p1').innerText = "Paciente 1: " + casoAtual.p1_nome;
+            document.getElementById('ui-desc-p1').innerText = casoAtual.p1_desc;
+            document.getElementById('ui-label-p2').innerText = "Paciente 2: " + casoAtual.p2_nome;
+            document.getElementById('ui-desc-p2').innerText = casoAtual.p2_desc;
+
+            document.getElementById('ui-mecanismo').innerHTML = casoAtual.mecanismo;
+
+            document.getElementById('ui-laudo-label-p1').innerText = `Diagnóstico ${casoAtual.p1_curto}:`;
+            document.getElementById('ui-laudo-label-p2').innerText = `Diagnóstico ${casoAtual.p2_curto}:`;
+            
+            ['select-paciente1', 'select-paciente2'].forEach(id => {
+                document.getElementById(id).innerHTML = '<option value="0">Selecione o parecer clínico...</option><option value="negativo">Negativo (Saudável)</option><option value="portador">Portador Assintomático (Traço)</option><option value="positivo">Positivo (Afetado)</option>';
+            });
+            
+            resetarLaboratorio();
+        }
+
+        function resetarLaboratorio() {
+            preparoRealizado = false; gelRodou = false;
+            
+            document.getElementById('visor-pcr').innerText = "TERMOCICLADOR INATIVO";
+            document.getElementById('visor-pcr').classList.remove('ativo');
+            document.getElementById('btn-pcr').innerText = "1. AMPLIFICAR DNA";
+            document.getElementById('btn-pcr').disabled = false;
+
+            document.getElementById('btn-correr-gel').style.background = "#e74c3c";
+            document.getElementById('btn-correr-gel').innerText = "2. CORRER GEL";
+            document.getElementById('caixa-uv').classList.remove('ligado');
+            document.getElementById('erro-bancada').style.display = 'none';
+            document.getElementById('feedback-laudo').style.display = 'none';
+            
+            ['select-paciente1', 'select-paciente2'].forEach(id => {
+                document.getElementById(id).value = '0';
+            });
+            
+            const containerLanes = document.getElementById('gel-lanes-container');
+            containerLanes.innerHTML = '';
+            
+            casoAtual.pistas.forEach(pista => {
+                const pistaDiv = document.createElement('div');
+                pistaDiv.className = 'pista';
+                
+                const nomeDiv = document.createElement('div');
+                nomeDiv.className = 'nome-amostra';
+                nomeDiv.innerHTML = pista.nome;
+                
+                const pocoDiv = document.createElement('div');
+                pocoDiv.className = 'poco';
+                
+                pistaDiv.appendChild(nomeDiv);
+                pistaDiv.appendChild(pocoDiv);
+                
+                pista.bandas.forEach(altura => {
+                    const banda = document.createElement('div');
+                    banda.className = 'banda';
+                    banda.setAttribute('data-destino', altura);
+                    pistaDiv.appendChild(banda);
+                });
+                
+                containerLanes.appendChild(pistaDiv);
+            });
+            
+            document.querySelectorAll('.tab-btn')[0].click();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            popularEnciclopedia(); 
+
+            const botoesAbas = document.querySelectorAll('.tab-btn');
+            const conteudosAbas = document.querySelectorAll('.tab-pane');
+            botoesAbas.forEach(botao => {
+                botao.addEventListener('click', () => {
+                    botoesAbas.forEach(b => b.classList.remove('ativo'));
+                    conteudosAbas.forEach(a => a.classList.remove('ativo'));
+                    botao.classList.add('ativo');
+                    document.getElementById(botao.getAttribute('data-target')).classList.add('ativo');
+                });
+            });
+
+            document.getElementById('btn-pcr').addEventListener('click', function() {
+                if(preparoRealizado) return;
+                this.disabled = true;
+                this.innerText = "AMPLIFICANDO...";
+                document.getElementById('visor-pcr').innerText = "PROCESSANDO AMOSTRAS";
+                setTimeout(() => {
+                    document.getElementById('visor-pcr').innerText = "DNA AMPLIFICADO";
+                    document.getElementById('visor-pcr').classList.add('ativo');
+                    this.innerText = "PCR CONCLUÍDA";
+                    preparoRealizado = true;
+                    document.getElementById('erro-bancada').style.display = 'none';
+                }, 2000);
+            });
+
+            const inputVoltagem = document.getElementById('input-voltagem');
+            const visorV = document.getElementById('visor-v');
+            inputVoltagem.addEventListener('input', function() { visorV.innerText = this.value.padStart(3, '0') + 'V'; });
+
+            document.getElementById('btn-correr-gel').addEventListener('click', function() {
+                if(gelRodou) return;
+                const erroBox = document.getElementById('erro-bancada');
+                const voltagem = parseInt(inputVoltagem.value);
+
+                if (!preparoRealizado) { 
+                    erroBox.style.display = "block"; 
+                    erroBox.innerHTML = `<b>PROTOCOLO INCOMPLETO:</b> Realize a etapa de PCR e Amplificação do DNA (Passo 1) antes de prosseguir.`; 
+                    return; 
+                }
+                
+                if (voltagem < cubaAtualObj.min || voltagem > cubaAtualObj.max) { 
+                    erroBox.style.display = "block"; 
+                    erroBox.innerHTML = `<b>ERRO DE VOLTAGEM:</b> Para a Cuba ${cubaAtualObj.nome} (${cubaAtualObj.cm} cm), a voltagem analítica deve estar entre ${cubaAtualObj.min}V e ${cubaAtualObj.max}V. O painel registrou ${voltagem}V. Ajuste o controle.`; 
+                    return; 
+                }
+
+                erroBox.style.display = "none";
+                gelRodou = true;
+                this.style.background = "#27ae60";
+                this.innerText = "MIGRANDO FASES...";
+                document.getElementById('caixa-uv').classList.add('ligado');
+
+                const bandas = document.querySelectorAll('.banda');
+                bandas.forEach(banda => {
+                    const destino = banda.getAttribute('data-destino');
+                    banda.style.visibility = "visible";
+                    banda.style.transition = `top 3s ease-out`;
+                    setTimeout(() => { banda.style.top = destino; }, 200);
+                });
+            });
+
+            document.getElementById('btn-enviar-laudo').addEventListener('click', function() {
+                const diagP1 = document.getElementById('select-paciente1').value; 
+                const diagP2 = document.getElementById('select-paciente2').value;
+                const feedback = document.getElementById('feedback-laudo');
+                feedback.style.display = 'block';
+
+                if (!gelRodou || !preparoRealizado) { feedback.style.background = '#F8D7DA'; feedback.style.color = '#721C24'; feedback.innerHTML = "<b>Aviso de Conduta:</b> Conclua todas as fases do protocolo analítico antes de consolidar o laudo."; return; }
+                if (diagP1 === "0" || diagP2 === "0") { feedback.style.background = '#FFF3CD'; feedback.style.color = '#856404'; feedback.innerText = "É mandatório declarar o parecer conclusivo final para todos os indivíduos genotipados."; return; }
+
+                if (diagP1 === casoAtual.laudo_p1 && diagP2 === casoAtual.laudo_p2) {
+                    feedback.style.background = '#D4EDDA'; feedback.style.color = '#155724'; feedback.innerHTML = `<h3 style="margin-top:0;">Fase Laboratorial Concluída e Aprovada</h3>${casoAtual.feedback_laudo}`;
+                    
+                    // GATILHO INVISÍVEL
+                    if (typeof registrarConclusaoSilenciosa === "function") {
+                        registrarConclusaoSilenciosa("Mundo Molecular");
+                    }
+                } else {
+                    feedback.style.background = '#F8D7DA'; feedback.style.color = '#721C24'; feedback.innerHTML = "<b>Laudo Técnico Incorreto.</b> Reavalie cautelosamente a eletroforese comparando as bandas de cada familiar com os controles.";
+                }
+            });
+        });
+    </script>
+
+    <!-- RASTREADOR INVISÍVEL PARA O RELATÓRIO DA MONITORIA -->
+    <script>
+        function registrarConclusaoSilenciosa(nomeDoModulo) {
+            const nome = localStorage.getItem('genelab_nome') || 'Aluno Desconhecido';
+            const matricula = localStorage.getItem('genelab_matricula') || 'Sem Matrícula';
+
+            // Cria uma trava silenciosa no navegador para não preencher a planilha 10x se o aluno clicar várias vezes
+            const chaveTrava = 'genelab_enviado_' + nomeDoModulo;
+            if (localStorage.getItem(chaveTrava) === 'true') {
+                return; // Se já mandou, não faz nada
+            }
+
+            // COLOQUE O SEU LINK DO GOOGLE APPS SCRIPT AQUI DENTRO DAS ASPAS:
+            const urlDaPlanilha = "https://script.google.com/macros/s/AKfycbxkAHZIGcJpbTUXMIJkGE4CBhSh0C5pl_7IgvTIWoc2idZxJmcdqPTFnkRxxoWXwdY/exec";
+
+            fetch(urlDaPlanilha, {
+                method: 'POST',
+                body: JSON.stringify({ nome: nome, matricula: matricula, modulo: nomeDoModulo }),
+                // Usar text/plain evita bloqueios de segurança (CORS) do navegador
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+            }).then(response => {
+                // Sucesso! O dado caiu na planilha. Trava o envio para este módulo.
+                localStorage.setItem(chaveTrava, 'true');
+            }).catch(error => {
+                console.error("Erro no rastreador:", error);
+            });
+        }
+    </script>
+</body>
+</html> 

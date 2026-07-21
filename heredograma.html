@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>Análise de Heredograma | GeneLab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* RESET BÁSICO E PROTEÇÃO DE TOQUE */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Montserrat', sans-serif; 
+    -webkit-tap-highlight-color: transparent; 
+}
+
+/* TRAVA DE SELEÇÃO DE TEXTO NO BODY */
+body { 
+    -webkit-user-select: none; 
+    -moz-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none; 
+    max-width: 100vw; 
+    overflow-x: hidden; 
+    min-height: 100vh;
+    background-color: #F0F4F8;
+    background: linear-gradient(135deg, #F0F4F8, #E2E8F0) no-repeat center center fixed; 
+    background-size: cover; color: #1A2B4C; display: flex; flex-direction: column; 
+}
+
+/* LIBERAÇÃO PARA CAIXAS DE DIGITAÇÃO */
+input, select, textarea {
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
+}
+        
+        /* NAVBAR */
+        .lab-navbar { background-color: #0A2540; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; }
+        .btn-voltar { color: #20B2AA; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .btn-voltar:hover { color: #FFFFFF; transform: translateX(-3px); }
+        .lab-logo { font-size: 1.5rem; font-weight: 800; margin: 0; }
+        .lab-logo span { color: #20B2AA; }
+
+        .container-app { padding: 30px 4%; max-width: 1600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
+
+        .header-secao h1 { color: #0A2540; font-size: 1.8rem; margin-bottom: 5px; }
+        .header-secao p { color: #5A6B80; font-size: 1rem; }
+
+        /* =========================================
+           GRID: 3 COLUNAS (Casos | Painel Central | Painel Lateral)
+           ========================================= */
+        .grid-anamnese { 
+            display: grid; 
+            grid-template-columns: 320px 1fr 340px; 
+            gap: 20px; 
+            align-items: start;
+            width: 100%;
+        }
+
+        /* -----------------------------------------
+           COLUNA 1: MENU DE CASOS (ESQUERDA)
+           ----------------------------------------- */
+        .painel-casos { display: flex; flex-direction: column; gap: 15px; width: 100%; min-width: 0; }
+        .titulo-prontuarios { color: #0A2540; font-size: 1.1rem; margin-top: 5px; margin-bottom: 5px; }
+
+        .btn-aleatorio-novo {
+            background: #0A2540; color: white; border-radius: 8px; padding: 15px; width: 100%; 
+            border: none; font-weight: 700; font-size: 1rem; cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(10,37,64,0.2); transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-aleatorio-novo:hover { background: #133A60; transform: translateY(-2px); }
+
+        .lista-prontuarios {
+            display: flex; flex-direction: column; gap: 14px;
+            max-height: 520px; overflow-y: auto; padding-right: 5px; padding-bottom: 5px;
+        }
+
+        .lista-prontuarios::-webkit-scrollbar { width: 6px; }
+        .lista-prontuarios::-webkit-scrollbar-thumb { background: #CBD3DD; border-radius: 10px; }
+
+        .card-prontuario {
+            background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 16px; 
+            cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative; display: flex; flex-direction: column; gap: 4px;
+        }
+        .card-prontuario::before {
+            content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: transparent; transition: 0.2s; border-top-left-radius: 8px; border-bottom-left-radius: 8px;
+        }
+        .card-prontuario:hover { border-color: #CBD3DD; transform: translateY(-1px); }
+        .card-prontuario.ativo { border-color: #20B2AA; background: #F4FAF9; }
+        .card-prontuario.ativo::before { background: #20B2AA; }
+        
+        .card-prontuario h4 { color: #0A2540; margin-bottom: 2px; font-size: 0.95rem; }
+        .card-prontuario p { color: #718096; font-size: 0.75rem; font-weight: 500; }
+
+        .tag-tipo { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px; align-self: flex-start; }
+        .tag-montagem { background: #EBF8FF; color: #3182CE; }
+        .tag-interpretacao { background: #FEEBC8; color: #D69E2E; }
+
+        /* -----------------------------------------
+           COLUNA 2: PAINEL CENTRAL (HEREDOGRAMAS)
+           ----------------------------------------- */
+        .painel-arvore {
+            background: #FFFFFF; border-radius: 12px; padding: 30px 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            display: flex; flex-direction: column; align-items: center; min-height: 550px; justify-content: flex-start; width: 100%; min-width: 0;
+        }
+
+        .arvore-wrapper { width: 100%; overflow-x: auto; display: flex; justify-content: center; -webkit-overflow-scrolling: touch; padding: 10px 0; }
+        
+        .arvore { position: relative; width: 380px; height: 380px; margin: 0 auto; transform: scale(0.95); transform-origin: top center; }
+
+        .nodo { position: absolute; width: 42px; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        .nodo.interativo { cursor: pointer; transition: transform 0.2s; }
+        .nodo.interativo:hover { transform: scale(1.12); }
+        
+        .simbolo { width: 42px; height: 42px; border: 3px solid #0A2540; background: white; transition: 0.3s; flex-shrink: 0; }
+        .simbolo.homem { border-radius: 3px; }
+        .simbolo.mulher { border-radius: 50%; }
+        
+        .label { font-size: 0.75rem; font-weight: bold; color: #5A6B80; margin-top: 4px; text-align: center; white-space: nowrap; background: rgba(255,255,255,0.95); padding: 1px 5px; border-radius: 4px; z-index: 12; }
+        
+        .afetado { background: #0A2540 !important; }
+        .portador { background: linear-gradient(90deg, #0A2540 50%, white 50%) !important; }
+
+        .linha { position: absolute; background: #0A2540; z-index: 1; }
+        
+        /* Geometria Árvore Padrão (Montagem) */
+        .g1-avo { left: 80px; top: 10px; }
+        .g1-ava { left: 200px; top: 10px; }
+        .linha-c1 { left: 102.5px; top: 32.5px; width: 120px; height: 3px; }
+        .haste-c1 { left: 162.5px; top: 32.5px; width: 3px; height: 75px; }
+        
+        .g2-tio { left: 20px; top: 145px; }
+        .g2-mae { left: 140px; top: 145px; }
+        .g2-pai { left: 260px; top: 145px; }
+        
+        .linha-irmaos-c1 { left: 42.5px; top: 105px; width: 120px; height: 3px; }
+        .haste-tio { left: 42.5px; top: 105px; width: 3px; height: 40px; }
+        .haste-mae { left: 162.5px; top: 105px; width: 3px; height: 40px; }
+        
+        .linha-c2 { left: 162.5px; top: 167.5px; width: 120px; height: 3px; }
+        .haste-c2 { left: 222.5px; top: 167.5px; width: 3px; height: 75px; }
+
+        .g3-f1 { left: 100px; top: 260px; }
+        .g3-f2 { left: 200px; top: 260px; }
+        .g3-f3 { left: 300px; top: 260px; }
+        
+        .linha-irmaos-c2 { left: 122.5px; top: 220px; width: 200px; height: 3px; }
+        .haste-f1 { left: 122.5px; top: 220px; width: 3px; height: 40px; }
+        .haste-f2 { left: 222.5px; top: 220px; width: 3px; height: 40px; }
+        .haste-f3 { left: 322.5px; top: 220px; width: 3px; height: 40px; }
+
+        /* Geometria Questão IFMG */
+        .ifmg-1 { left: 100px; top: 15px; }
+        .ifmg-2 { left: 220px; top: 15px; }
+        .ifmg-l1 { left: 121px; top: 36px; width: 120px; height: 3px; }
+        .ifmg-h1 { left: 181px; top: 36px; width: 3px; height: 45px; }
+        .ifmg-li2 { left: 91px; top: 81px; width: 180px; height: 3px; }
+        .ifmg-3 { left: 70px; top: 96px; }
+        .ifmg-4 { left: 160px; top: 96px; }
+        .ifmg-5 { left: 250px; top: 96px; }
+        .ifmg-h3 { left: 91px; top: 81px; width: 3px; height: 15px; }
+        .ifmg-h4 { left: 181px; top: 81px; width: 3px; height: 15px; }
+        .ifmg-h5 { left: 271px; top: 81px; width: 3px; height: 50px; }
+        .ifmg-l3 { left: 271px; top: 131px; width: 60px; height: 3px; }
+        .ifmg-6 { left: 310px; top: 110px; }
+        .ifmg-h6 { left: 301px; top: 131px; width: 3px; height: 20px; }
+        .ifmg-7 { left: 280px; top: 151px; }
+
+        /* Geometria Ajustada - Questão PUC-PR */
+        .puc-1 { left: 90px; top: 15px; }
+        .puc-2 { left: 210px; top: 15px; }
+        .puc-l1 { left: 111px; top: 36px; width: 120px; height: 3px; }
+        .puc-h1 { left: 171px; top: 36px; width: 3px; height: 45px; }
+        .puc-li2 { left: 111px; top: 81px; width: 130px; height: 3px; }
+        .puc-4 { left: 100px; top: 96px; }
+        .puc-5 { left: 220px; top: 96px; }
+        .puc-h4 { left: 121px; top: 81px; width: 3px; height: 15px; }
+        .puc-h5 { left: 241px; top: 81px; width: 3px; height: 36px; }
+        .puc-3 { left: 20px; top: 96px; }
+        .puc-l3 { left: 41px; top: 117px; width: 80px; height: 3px; }
+        .puc-h3 { left: 41px; top: 96px; width: 3px; height: 21px; }
+        .puc-7 { left: 60px; top: 156px; }
+        .puc-h7 { left: 81px; top: 117px; width: 3px; height: 39px; }
+        .puc-l5 { left: 241px; top: 117px; width: 90px; height: 3px; }
+        .puc-6 { left: 310px; top: 96px; display: flex; flex-direction: row !important; width: auto !important; align-items: center !important; gap: 6px; }
+        .puc-6 .label { margin-top: 0 !important; }
+        .puc-h6 { left: 331px; top: 117px; width: 3px; height: 43px; }
+        .puc-li3 { left: 241px; top: 160px; width: 180px; height: 3px; }
+        .puc-8 { left: 230px; top: 178px; }
+        .puc-9 { left: 310px; top: 178px; }
+        .puc-10 { left: 390px; top: 178px; }
+        .puc-h8 { left: 251px; top: 160px; width: 3px; height: 18px; }
+        .puc-h9 { left: 331px; top: 160px; width: 3px; height: 18px; }
+        .puc-h10 { left: 411px; top: 160px; width: 3px; height: 18px; }
+
+        .legenda { display: flex; gap: 15px; margin-top: 15px; font-size: 0.8rem; color: #5A6B80; justify-content: center; flex-wrap: wrap; background: #F8FAFC; padding: 10px 15px; border-radius: 8px; border: 1px solid #E2E8F0; width: 100%; }
+        .legenda-item { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .mini-simbolo { width: 14px; height: 14px; border: 2px solid #0A2540; }
+
+        /* Estilo para Modo Interpretação (Vestibular) */
+        .painel-questao-conteudo { width: 100%; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+        .badge-vestibular { background: #ED8936; color: white; font-weight: 700; font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; align-self: flex-start; text-transform: uppercase; }
+        .texto-enunciado { font-size: 0.9rem; line-height: 1.5; color: #2D3748; }
+        .lista-alternativas { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        .opcao-alt { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; cursor: pointer; transition: 0.2s; background: #FAFCFF; }
+        .opcao-alt:hover { border-color: #CBD3DD; background: #EDF2F7; }
+        .opcao-alt input { margin-top: 3px; }
+        .opcao-alt label { font-size: 0.85rem; color: #2D3748; cursor: pointer; width: 100%; }
+
+        /* -----------------------------------------
+           COLUNA 3: PAINEL LATERAL COM ROLAGEM CORRIGIDA
+           ----------------------------------------- */
+        .painel-detalhes { 
+            background: #FFFFFF; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            display: flex; flex-direction: column; gap: 15px; width: 100%; min-width: 0; 
+            max-height: 650px; overflow-y: auto; position: relative;
+        }
+        .painel-detalhes::-webkit-scrollbar { width: 6px; }
+        .painel-detalhes::-webkit-scrollbar-thumb { background: #CBD3DD; border-radius: 10px; }
+
+        .titulo-detalhes { color: #0A2540; font-size: 1.2rem; margin-bottom: 5px; border-bottom: 2px solid #F0F4F8; padding-bottom: 10px; }
+        .prontuario-texto { font-size: 0.95rem; line-height: 1.6; color: #4A5568; }
+        
+        .btn-validar { background: #20B2AA; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 1.05rem; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(32, 178, 170, 0.2); margin-top: 15px; flex-shrink: 0; }
+        .btn-validar:hover { background: #178983; transform: translateY(-2px); }
+
+        .mensagem-feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; display: none; line-height: 1.5; animation: fadeIn 0.3s; }
+        .feedback-erro { background: #FADBD8; color: #78281F; border: 1px solid #E74C3C; border-left: 5px solid #E74C3C; }
+        .feedback-sucesso { background: #D5F5E3; color: #186A3B; border: 1px solid #2ECC71; border-left: 5px solid #2ECC71; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 1024px) {
+            .container-app { padding: 20px 3%; }
+            .grid-anamnese { grid-template-columns: 1fr; } 
+            .painel-detalhes { max-height: none; overflow-y: visible; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="lab-navbar">
+        <a href="index.html" class="btn-voltar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Recepção
+        </a>
+        <div class="lab-logo">Gene<span>Lab</span></div>
+    </nav>
+
+    <main class="container-app">
+        
+        <div class="header-secao">
+            <h1>Análise de Heredograma</h1>
+            <p>Selecione um caso na esquerda (Modo Montagem ou Interpretação) e interaja com os painéis ao lado.</p>
+        </div>
+
+        <div class="grid-anamnese">
+            
+            <!-- COLUNA 1: MENU DE CASOS (ESQUERDA) -->
+            <div class="painel-casos">
+                <button class="btn-aleatorio-novo" onclick="casoAleatorio()">
+                    🎲 Investigar Caso Aleatório
+                </button>
+                
+                <h3 class="titulo-prontuarios">Prontuários e Questões</h3>
+                
+                <div class="lista-prontuarios" id="lista-casos">
+                    <!-- Gerados via JavaScript -->
+                </div>
+            </div>
+
+            <!-- COLUNA 2: PAINEL CENTRAL (DINÂMICO) -->
+            <div class="painel-arvore" id="painel-central">
+                <!-- Conteúdo injetado via JS -->
+            </div>
+
+            <!-- COLUNA 3: PAINEL DE DETALHES / AÇÃO (DIREITA) -->
+            <div class="painel-detalhes" id="painel-direito">
+                <!-- Conteúdo injetado via JS -->
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const casos = {
+            1: {
+                nome: "Casal J. e M.",
+                subtitulo: "Prontuário #001 · Genética",
+                modo: "montagem",
+                tipo: "autossomico-recessivo",
+                texto: "<strong>Caso Clínico: Fibrose Cística</strong><br><br>Uma família procura aconselhamento genético após o nascimento da criança III.2, que manifestou sintomas severos de uma patologia autossômica recessiva. Os avós parentais (Geração I) e os tios (II.1) não manifestam a doença clinicamente. O pai (II.3) e a mãe (II.2) são fenotipicamente normais. Sabe-se que a linhagem materna guarda um histórico antigo da mutação.<br><br><em>Desafio:</em> Analise o fluxo do heredograma, identifique o indivíduo afetado e mapeie quais familiares atuam obrigatoriamente como portadores silenciosos (heterozigotos) para que a condição se manifeste na prole.",
+                gabarito: { i1: 'saudavel', i2: 'portador', ii1: 'saudavel', ii2: 'portador', ii3: 'portador', iii1: 'saudavel', iii2: 'afetado', iii3: 'saudavel' }
+            },
+            2: {
+                nome: "Paciente E.S.",
+                subtitulo: "Prontuário #002 · Hematologia",
+                modo: "montagem",
+                tipo: "ligado-x",
+                texto: "<strong>Caso Clínico: Hemofilia Grave</strong><br><br>Investigação de um distúrbio severo de coagulação sanguínea. Na Geração I, o avô materno (I.1) apresenta o quadro clínico ativo, enquanto sua parceira (I.2) é saudável. Na Geração II, a descendente direta uniu-se a um homem saudável (II.3). O casal teve três filhos, sendo que um deles (III.2) herdou a anomalia hemofílica.<br><br><em>Desafio:</em> Rastreie a transmissão cromossômica sexual. Determine o indivíduo afetado e descubra qual membro da família serviu como a única ponte genética feminina intermediária (portadora).",
+                gabarito: { i1: 'afetado', i2: 'saudavel', ii1: 'saudavel', ii2: 'portador', ii3: 'saudavel', iii1: 'saudavel', iii2: 'afetado', iii3: 'saudavel' }
+            },
+            3: {
+                nome: "Paciente C.H.",
+                subtitulo: "Prontuário #003 · Ortopedia",
+                modo: "montagem",
+                tipo: "autossomico-dominante",
+                texto: "<strong>Caso Clínico: Acondroplasia</strong><br><br>Análise de um heredograma multigeracional com traços de displasia esquelética. Observa-se que a avó (I.2) manifesta a condição patológica, ao passo que o avô (I.1) possui fenótipo esquelético normal. O traço foi transmitido para a mãe (II.2), mas não para o tio (II.1). A mãe casou-se com um parceiro saudável (II.3), gerando três filhos, onde apenas o descendente III.2 herdou a desordem.<br><br><em>Desafio:</em> Aplique os critérios lógicos de herança dominante para assinalar corretamente todos os indivíduos afetados expressivos na árvore.",
+                gabarito: { i1: 'saudavel', i2: 'afetado', ii1: 'saudavel', ii2: 'afetado', ii3: 'saudavel', iii1: 'saudavel', iii2: 'afetado', iii3: 'saudavel' }
+            },
+            4: {
+                nome: "Casal G.H.",
+                subtitulo: "Prontuário #004 · Oftalmologia",
+                modo: "montagem",
+                tipo: "ligado-x",
+                texto: "<strong>Caso Clínico: Daltonismo</strong><br><br>Estudo oftalmológico focado em anomalias de percepção de cores. A avó materna (I.2) manifesta daltonismo completo, enquanto o avô (I.1) possui visão cromática normal. Esse cruzamento resultou em um filho homem (II.1) afetado. A filha (II.2) nasceu com visão normal e uniu-se a um homem saudável (II.3). O casal gerou descendentes, culminando no aparecimento do traço em III.3.<br><br><em>Desafio:</em> Desvende a herança recessiva, identificando o grau de expressão em homens e o papel oculto das mulheres na transmissão.",
+                gabarito: { i1: 'saudavel', i2: 'afetado', ii1: 'afetado', ii2: 'portador', ii3: 'saudavel', iii1: 'saudavel', iii2: 'saudavel', iii3: 'afetado' }
+            },
+            5: {
+                nome: "Paciente M.O.",
+                subtitulo: "Prontuário #005 · Reprodução",
+                modo: "montagem",
+                tipo: "autossomico-recessivo",
+                texto: "<strong>Caso Clínico: Albinismo</strong><br><br>Avaliação de distúrbio metabólico na síntese de melanina. Nenhum dos avós da Geração I apresenta alterações fenotípicas visíveis, mas investigações retrospectivas apontam portadores ocultos em ambas as famílias. Na Geração II, o indivíduo II.1 manifesta albinismo. A descendente II.2, sem sintomas, uniu-se a um parceiro (II.3) que também guardava a mutação oculta. Desse cruzamento, nasceu a criança III.1 com a condição.<br><br><em>Desafio:</em> Localize o paciente afetado e deduza com rigor lógico todos os portadores heterozigotos escondidos nas gerações anteriores.",
+                gabarito: { i1: 'portador', i2: 'portador', ii1: 'afetado', ii2: 'portador', ii3: 'portador', iii1: 'afetado', iii2: 'saudavel', iii3: 'saudavel' }
+            },
+            6: {
+                nome: "Paciente R.V.",
+                subtitulo: "Prontuário #006 · Endocrinologia",
+                modo: "montagem",
+                tipo: "ligado-y",
+                texto: "<strong>Caso Clínico: Distúrbio Fenotípico Restrito</strong><br><br>Investigação de um traço dermatológico curioso em uma família acompanhada pelo laboratório. Observa-se que o avô paterno (I.1) apresenta o traço característico, enquanto sua parceira (I.2) não exibe nenhuma alteração. O pai (II.3) e o tio (II.1) manifestam exatamente a mesma condição física. Na descendência III, o traço manifesta-se nos filhos homens.<br><br><em>Desafio:</em> Analise atentamente a distribuição dos afetados ao longo das gerações e descubra qual é o padrão oculto de herança que restringe a manifestação da condição.",
+                gabarito: { i1: 'afetado', i2: 'saudavel', ii1: 'afetado', ii2: 'saudavel', ii3: 'afetado', iii1: 'saudavel', iii2: 'afetado', iii3: 'afetado' }
+            },
+            7: {
+                nome: "Questão IFMG",
+                subtitulo: "Vestibular · Análise de Heredograma",
+                modo: "interpretacao",
+                referencia: "IFMG",
+                enunciado: "Considere o heredograma abaixo, no qual os indivíduos em negro são portadores de uma determinada característica. Identifique a afirmativa incorreta:",
+                opcoes: [
+                    { letra: 'a', texto: "Trata-se de uma característica autossômica recessiva.", correta: false },
+                    { letra: 'b', texto: "O genótipo do indivíduo 3 é certamente Aa.", correta: true },
+                    { letra: 'c', texto: "Os indivíduos 4 e 7 apresentam os mesmos genótipos e fenótipos.", correta: false },
+                    { letra: 'd', texto: "Os indivíduos 1, 2 e 6 têm o mesmo genótipo.", correta: false }
+                ],
+                explicacao: "<strong>Gabarito: Letra B</strong><br><br>O indivíduo 3 é fenotipicamente normal filho de pais normais portadores (Aa x Aa), logo seu genótipo pode ser AA ou Aa (probabilidade de 2/3 de ser Aa), portanto afirmar que ele é <em>certamente</em> Aa está incorreto."
+            },
+            8: {
+                nome: "Questão PUC-PR",
+                subtitulo: "Vestibular · Análise de Heredograma",
+                modo: "interpretacao",
+                referencia: "PUC-PR",
+                enunciado: "Analisando o heredograma a seguir, conclui-se que dois dos dez indivíduos são vítimas de uma anomalia causada pela ação de um gene recessivo. Assinale a opção que contém os números que representam indivíduos cujos genótipos não podem ser determinados:",
+                opcoes: [
+                    { letra: 'a', texto: "1, 2, 3, 5 e 6", correta: false },
+                    { letra: 'b', texto: "5, 6 e 7", correta: false },
+                    { letra: 'c', texto: "3, 8 e 10", correta: true },
+                    { letra: 'd', texto: "1, 2, 5, 6, 7, 8 e 10", correta: false },
+                    { letra: 'e', texto: "7, 8 e 10", correta: false }
+                ],
+                explicacao: "<strong>Gabarito: Letra C</strong><br><br>Como os indivíduos 1, 2, 5 e 6 tiveram filhos afetados, sabemos que são heterozigotos. Já os indivíduos 4 e 9 são homozigotos recessivos. Como o indivíduo 7 é normal, mas filho de uma mulher afetada, sabemos que ele é heterozigoto. Desse modo, não é possível determinar o genótipo de 3, 8 e 10."
+            }
+        };
+
+        let casoAtual = 1;
+
+        function renderizarListaCasos() {
+            const lista = document.getElementById('lista-casos');
+            lista.innerHTML = '';
+            
+            Object.keys(casos).forEach(id => {
+                const caso = casos[id];
+                const ativo = id == casoAtual ? 'ativo' : '';
+                const tagClass = caso.modo === 'montagem' ? 'tag-montagem' : 'tag-interpretacao';
+                const tagText = caso.modo === 'montagem' ? 'Montagem' : 'Interpretação';
+
+                lista.innerHTML += `
+                    <div class="card-prontuario ${ativo}" id="card-caso-${id}" onclick="carregarCaso(${id})">
+                        <h4>${caso.nome}</h4>
+                        <p>${caso.subtitulo}</p>
+                        <span class="tag-tipo ${tagClass}">${tagText}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function carregarCaso(id) {
+            casoAtual = id;
+            renderizarListaCasos();
+            
+            const caso = casos[id];
+            const painelCentral = document.getElementById('painel-central');
+            const painelDireito = document.getElementById('painel-direito');
+
+            if (caso.modo === 'montagem') {
+                painelCentral.innerHTML = `
+                    <div class="arvore-wrapper">
+                        <div class="arvore" id="arvore-container">
+                            <div class="linha linha-c1"></div>
+                            <div class="linha haste-c1"></div>
+                            <div class="linha linha-irmaos-c1"></div>
+                            <div class="linha haste-tio"></div>
+                            <div class="linha haste-mae"></div>
+                            <div class="linha linha-c2"></div>
+                            <div class="linha haste-c2"></div>
+                            <div class="linha linha-irmaos-c2"></div>
+                            <div class="linha haste-f1"></div>
+                            <div class="linha haste-f2"></div>
+                            <div class="linha haste-f3"></div>
+
+                            <div class="nodo interativo g1-avo" data-id="i1" data-sexo="homem" onclick="mudarEstado(this)"><div class="simbolo homem"></div><span class="label">I.1</span></div>
+                            <div class="nodo interativo g1-ava" data-id="i2" data-sexo="mulher" onclick="mudarEstado(this)"><div class="simbolo mulher"></div><span class="label">I.2</span></div>
+                            <div class="nodo interativo g2-tio" data-id="ii1" data-sexo="homem" onclick="mudarEstado(this)"><div class="simbolo homem"></div><span class="label">II.1</span></div>
+                            <div class="nodo interativo g2-mae" data-id="ii2" data-sexo="mulher" onclick="mudarEstado(this)"><div class="simbolo mulher"></div><span class="label">II.2</span></div>
+                            <div class="nodo interativo g2-pai" data-id="ii3" data-sexo="homem" onclick="mudarEstado(this)"><div class="simbolo homem"></div><span class="label">II.3</span></div>
+                            <div class="nodo interativo g3-f1" data-id="iii1" data-sexo="mulher" onclick="mudarEstado(this)"><div class="simbolo mulher"></div><span class="label">III.1</span></div>
+                            <div class="nodo interativo g3-f2" data-id="iii2" data-sexo="homem" onclick="mudarEstado(this)"><div class="simbolo homem"></div><span class="label">III.2</span></div>
+                            <div class="nodo interativo g3-f3" data-id="iii3" data-sexo="homem" onclick="mudarEstado(this)"><div class="simbolo homem"></div><span class="label">III.3</span></div>
+                        </div>
+                    </div>
+                    <div class="legenda">
+                        <div class="legenda-item"><div class="mini-simbolo"></div> Saudável</div>
+                        <div class="legenda-item"><div class="mini-simbolo afetado"></div> Afetado (Doente)</div>
+                        <div class="legenda-item"><div class="mini-simbolo portador"></div> Portador (Recessivo)</div>
+                    </div>
+                `;
+
+                painelDireito.innerHTML = `
+                    <h2 class="titulo-detalhes">Prontuário da Família</h2>
+                    <div class="prontuario-texto" id="texto-prontuario">${caso.texto}</div>
+                    <button class="btn-validar" onclick="validarHeredograma()">Validar Mapeamento</button>
+                    <div class="mensagem-feedback" id="mensagem-feedback"></div>
+                `;
+
+            } else if (caso.modo === 'interpretacao') {
+                let htmlOpcoes = '';
+                caso.opcoes.forEach(op => {
+                    htmlOpcoes += `
+                        <div class="opcao-alt" onclick="selecionarAlternativa('${op.letra}')">
+                            <input type="radio" name="vestibular" id="alt-${op.letra}" value="${op.letra}">
+                            <label for="alt-${op.letra}"><b>${op.letra.toUpperCase()}</b> ${op.texto}</label>
+                        </div>
+                    `;
+                });
+
+                let htmlArvoreVestibular = '';
+                if (caso.referencia === 'IFMG') {
+                    htmlArvoreVestibular = `
+                        <div class="arvore-wrapper">
+                            <div class="arvore">
+                                <div class="linha ifmg-l1"></div><div class="linha ifmg-h1"></div><div class="linha ifmg-li2"></div>
+                                <div class="linha ifmg-h3"></div><div class="linha ifmg-h4"></div><div class="linha ifmg-h5"></div>
+                                <div class="linha ifmg-l3"></div><div class="linha ifmg-h6"></div>
+                                <div class="nodo ifmg-1"><div class="simbolo homem"></div><span class="label">1</span></div>
+                                <div class="nodo ifmg-2"><div class="simbolo mulher"></div><span class="label">2</span></div>
+                                <div class="nodo ifmg-3"><div class="simbolo mulher"></div><span class="label">3</span></div>
+                                <div class="nodo ifmg-4"><div class="simbolo mulher afetado"></div><span class="label">4</span></div>
+                                <div class="nodo ifmg-5"><div class="simbolo homem"></div><span class="label">5</span></div>
+                                <div class="nodo ifmg-6"><div class="simbolo mulher"></div><span class="label">6</span></div>
+                                <div class="nodo ifmg-7"><div class="simbolo homem afetado"></div><span class="label">7</span></div>
+                            </div>
+                        </div>
+                    `;
+                } else if (caso.referencia === 'PUC-PR') {
+                    htmlArvoreVestibular = `
+                        <div class="arvore-wrapper">
+                            <div class="arvore" style="width: 440px;">
+                                <div class="linha puc-l1"></div><div class="linha puc-h1"></div><div class="linha puc-li2"></div>
+                                <div class="linha puc-h4"></div><div class="linha puc-h5"></div><div class="linha puc-l3"></div>
+                                <div class="linha puc-h3"></div><div class="linha puc-h7"></div><div class="linha puc-l5"></div>
+                                <div class="linha puc-h6"></div><div class="linha puc-li3"></div><div class="linha puc-h8"></div>
+                                <div class="linha puc-h9"></div><div class="linha puc-h10"></div>
+                                <div class="nodo puc-1"><div class="simbolo mulher"></div><span class="label">1</span></div>
+                                <div class="nodo puc-2"><div class="simbolo homem"></div><span class="label">2</span></div>
+                                <div class="nodo puc-3"><div class="simbolo homem"></div><span class="label">3</span></div>
+                                <div class="nodo puc-4"><div class="simbolo mulher afetado"></div><span class="label">4</span></div>
+                                <div class="nodo puc-5"><div class="simbolo homem"></div><span class="label">5</span></div>
+                                <div class="nodo puc-6"><div class="simbolo mulher"></div><span class="label">6</span></div>
+                                <div class="nodo puc-7"><div class="simbolo mulher"></div><span class="label">7</span></div>
+                                <div class="nodo puc-8"><div class="simbolo mulher"></div><span class="label">8</span></div>
+                                <div class="nodo puc-9"><div class="simbolo homem afetado"></div><span class="label">9</span></div>
+                                <div class="nodo puc-10"><div class="simbolo mulher"></div><span class="label">10</span></div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                painelCentral.innerHTML = `
+                    <div class="painel-questao-conteudo">
+                        <span class="badge-vestibular">Questão de Vestibular · ${caso.referencia}</span>
+                        ${htmlArvoreVestibular}
+                        <p class="texto-enunciado">${caso.enunciado}</p>
+                        <div class="lista-alternativas">
+                            ${htmlOpcoes}
+                        </div>
+                    </div>
+                `;
+
+                painelDireito.innerHTML = `
+                    <h2 class="titulo-detalhes">Resolução & Gabarito</h2>
+                    <div class="prontuario-texto">
+                        <p>Analise o heredograma ao lado, selecione a alternativa correta e clique em verificar para testar seu raciocínio.</p>
+                    </div>
+                    <button class="btn-validar" onclick="validarQuestaoVestibular()">Verificar Resposta</button>
+                    <div class="mensagem-feedback" id="mensagem-feedback"></div>
+                `;
+            }
+
+            if (window.innerWidth <= 1024) {
+                painelCentral.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function selecionarAlternativa(letra) {
+            const radio = document.getElementById('alt-' + letra);
+            if (radio) radio.checked = true;
+            document.getElementById('mensagem-feedback').style.display = 'none';
+        }
+
+        function validarQuestaoVestibular() {
+            const caso = casos[casoAtual];
+            const selecionado = document.querySelector('input[name="vestibular"]:checked');
+            const fb = document.getElementById('mensagem-feedback');
+
+            if (!selecionado) {
+                fb.innerHTML = `⚠️ <b>Atenção:</b> Selecione uma alternativa antes de verificar.`;
+                fb.className = 'mensagem-feedback feedback-erro';
+                fb.style.display = 'block';
+                return;
+            }
+
+            const letraEscolhida = selecionado.value;
+            const opcaoCorreta = caso.opcoes.find(op => op.correta);
+
+            if (letraEscolhida === opcaoCorreta.letra) {
+                fb.innerHTML = `✅ <b>Resposta Correta!</b><br><br>${caso.explicacao}`;
+                fb.className = 'mensagem-feedback feedback-sucesso';
+                
+                // ---> SALVANDO O PROGRESSO INVISÍVEL <---
+                if (typeof registrarConclusaoSilenciosa === "function") {
+                    registrarConclusaoSilenciosa("Heredograma (Interpretação)");
+                }
+            } else {
+                fb.innerHTML = `❌ <b>Resposta Incorreta.</b> A alternativa correta é a <b>(${opcaoCorreta.letra.toUpperCase()})</b>.<br><br>${caso.explicacao}`;
+                fb.className = 'mensagem-feedback feedback-erro';
+            }
+            fb.style.display = 'block';
+        }
+
+        function casoAleatorio() {
+            const ids = Object.keys(casos);
+            let randomId = casoAtual;
+            while(randomId == casoAtual) {
+                randomId = ids[Math.floor(Math.random() * ids.length)];
+            }
+            carregarCaso(randomId);
+            document.getElementById('card-caso-' + randomId).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        window.onload = () => {
+            renderizarListaCasos();
+            carregarCaso(1);
+        };
+
+        function mudarEstado(elemento) {
+            const simbolo = elemento.querySelector('.simbolo');
+            document.getElementById('mensagem-feedback').style.display = 'none'; 
+
+            if (!simbolo.classList.contains('afetado') && !simbolo.classList.contains('portador')) {
+                simbolo.classList.add('afetado');
+            } else if (simbolo.classList.contains('afetado')) {
+                simbolo.classList.remove('afetado');
+                simbolo.classList.add('portador');
+            } else {
+                simbolo.classList.remove('portador');
+            }
+        }
+
+        function validarHeredograma() {
+            const gabarito = casos[casoAtual].gabarito;
+            const tipoCaso = casos[casoAtual].tipo;
+            
+            let correto = true;
+            let erroBiologicoX = false;
+            let erroBiologicoY = false;
+            let erroBiologicoDominante = false;
+            let nomeErroBiologico = "";
+
+            document.querySelectorAll('.nodo.interativo').forEach(nodo => {
+                const id = nodo.getAttribute('data-id');
+                const sexo = nodo.getAttribute('data-sexo');
+                const label = nodo.querySelector('.label').innerText;
+                const simbolo = nodo.querySelector('.simbolo');
+                
+                let estadoUsuario = 'saudavel';
+                if (simbolo.classList.contains('afetado')) estadoUsuario = 'afetado';
+                if (simbolo.classList.contains('portador')) estadoUsuario = 'portador';
+
+                if (tipoCaso === "ligado-x" && sexo === "homem" && estadoUsuario === "portador") {
+                    erroBiologicoX = true;
+                    nomeErroBiologico = label;
+                }
+
+                if (tipoCaso === "ligado-y" && sexo === "mulher" && (estadoUsuario === "afetado" || estadoUsuario === "portador")) {
+                    erroBiologicoY = true;
+                    nomeErroBiologico = label;
+                }
+                
+                if (tipoCaso === "autossomico-dominante" && estadoUsuario === "portador") {
+                    erroBiologicoDominante = true;
+                    nomeErroBiologico = label;
+                }
+
+                if (estadoUsuario !== gabarito[id]) correto = false;
+            });
+
+            const fb = document.getElementById('mensagem-feedback');
+
+            if (erroBiologicoX) {
+                fb.innerHTML = `<b>ERRO CONCEITUAL:</b> Você marcou <b>${nomeErroBiologico}</b> como "Portador". Homens (XY) não podem esconder doenças ligadas ao X. Ou são Afetados, ou Saudáveis.`;
+                fb.className = 'mensagem-feedback feedback-erro';
+            } else if (erroBiologicoY) {
+                fb.innerHTML = `<b>ERRO CONCEITUAL:</b> Você atribuiu a condição a uma mulher (<b>${nomeErroBiologico}</b>). Analise o padrão de distribuição do traço na família: há restrições severas de gênero para esta patologia.`;
+                fb.className = 'mensagem-feedback feedback-erro';
+            } else if (erroBiologicoDominante) {
+                fb.innerHTML = `<b>ERRO CONCEITUAL:</b> Você marcou <b>${nomeErroBiologico}</b> como "Portador". Em doenças <b>Dominantes</b>, quem tem o gene manifesta a doença.`;
+                fb.className = 'mensagem-feedback feedback-erro';
+            } else if (correto) {
+                fb.innerHTML = `✅ <b>Mapeamento Perfeito!</b> Diagnóstico concluído com sucesso.`;
+                fb.className = 'mensagem-feedback feedback-sucesso';
+                
+                // ---> SALVANDO O PROGRESSO INVISÍVEL <---
+                if (typeof registrarConclusaoSilenciosa === "function") {
+                    registrarConclusaoSilenciosa("Heredograma (Montagem)");
+                }
+            } else {
+                fb.innerHTML = `❌ <b>Incorreto.</b> Releia o prontuário. Verifique se os portadores fazem sentido anatômico para passar o gene adiante.`;
+                fb.className = 'mensagem-feedback feedback-erro';
+            }
+            
+            fb.style.display = 'block';
+        }
+    </script>
+    
+    <!-- RASTREADOR INVISÍVEL PARA O RELATÓRIO DA MONITORIA -->
+    <script>
+        function registrarConclusaoSilenciosa(nomeDoModulo) {
+            const nome = localStorage.getItem('genelab_nome') || 'Aluno Desconhecido';
+            const matricula = localStorage.getItem('genelab_matricula') || 'Sem Matrícula';
+
+            // Cria uma trava silenciosa no navegador para não preencher a planilha 10x se o aluno clicar várias vezes
+            const chaveTrava = 'genelab_enviado_' + nomeDoModulo;
+            if (localStorage.getItem(chaveTrava) === 'true') {
+                return; // Se já mandou, não faz nada
+            }
+
+            // COLOQUE O SEU LINK DO GOOGLE APPS SCRIPT AQUI DENTRO DAS ASPAS:
+            const urlDaPlanilha = "https://script.google.com/macros/s/AKfycbxkAHZIGcJpbTUXMIJkGE4CBhSh0C5pl_7IgvTIWoc2idZxJmcdqPTFnkRxxoWXwdY/exec";
+
+            fetch(urlDaPlanilha, {
+                method: 'POST',
+                body: JSON.stringify({ nome: nome, matricula: matricula, modulo: nomeDoModulo }),
+                // Usar text/plain evita bloqueios de segurança (CORS) do navegador
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+            }).then(response => {
+                // Sucesso! O dado caiu na planilha. Trava o envio para este módulo.
+                localStorage.setItem(chaveTrava, 'true');
+            }).catch(error => {
+                console.error("Erro no rastreador:", error);
+            });
+        }
+    </script>
+</body>
+</html>
