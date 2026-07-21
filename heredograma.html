@@ -621,26 +621,30 @@ input, select, textarea {
 
             const fb = document.getElementById('mensagem-feedback');
 
-            if (erroBiologicoX) {
+      if (erroBiologicoX) {
                 fb.innerHTML = `<b>ERRO CONCEITUAL:</b> Você marcou <b>${nomeErroBiologico}</b> como "Portador". Homens (XY) não podem esconder doenças ligadas ao X. Ou são Afetados, ou Saudáveis.`;
                 fb.className = 'mensagem-feedback feedback-erro';
+                registrarConclusaoSilenciosa("Heredograma: " + casos[casoAtual].nome + " (Montagem)", "Errou ❌");
+                
             } else if (erroBiologicoY) {
                 fb.innerHTML = `<b>ERRO CONCEITUAL:</b> Você atribuiu a condição a uma mulher (<b>${nomeErroBiologico}</b>). Analise o padrão de distribuição do traço na família: há restrições severas de gênero para esta patologia.`;
                 fb.className = 'mensagem-feedback feedback-erro';
+                registrarConclusaoSilenciosa("Heredograma: " + casos[casoAtual].nome + " (Montagem)", "Errou ❌");
+                
             } else if (erroBiologicoDominante) {
                 fb.innerHTML = `<b>ERRO CONCEITUAL:</b> Você marcou <b>${nomeErroBiologico}</b> como "Portador". Em doenças <b>Dominantes</b>, quem tem o gene manifesta a doença.`;
                 fb.className = 'mensagem-feedback feedback-erro';
+                registrarConclusaoSilenciosa("Heredograma: " + casos[casoAtual].nome + " (Montagem)", "Errou ❌");
+                
             } else if (correto) {
                 fb.innerHTML = `✅ <b>Mapeamento Perfeito!</b> Diagnóstico concluído com sucesso.`;
                 fb.className = 'mensagem-feedback feedback-sucesso';
+                registrarConclusaoSilenciosa("Heredograma: " + casos[casoAtual].nome + " (Montagem)", "Acertou ✅");
                 
-                // ---> SALVANDO O PROGRESSO INVISÍVEL <---
-                if (typeof registrarConclusaoSilenciosa === "function") {
-                   registrarConclusaoSilenciosa("Heredograma: " + casos[casoAtual].nome + " (Montagem)");
-                }
             } else {
                 fb.innerHTML = `❌ <b>Incorreto.</b> Releia o prontuário. Verifique se os portadores fazem sentido anatômico para passar o gene adiante.`;
                 fb.className = 'mensagem-feedback feedback-erro';
+                registrarConclusaoSilenciosa("Heredograma: " + casos[casoAtual].nome + " (Montagem)", "Errou ❌");
             }
             
             fb.style.display = 'block';
