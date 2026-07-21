@@ -522,7 +522,7 @@ input, select, textarea {
         function irParaCasoClinico() { esconderTudo(); telaMissao.classList.remove('escondido'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function iniciarDesafio() { esconderTudo(); telaDesafio.classList.remove('escondido'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         
-        function verificarRespostas() {
+       function verificarRespostas() {
             const c1 = document.getElementById('cel1'); const c2 = document.getElementById('cel2');
             const c3 = document.getElementById('cel3'); const c4 = document.getElementById('cel4');
             const msg = document.getElementById('msgDesafio'); const btnLupa = document.getElementById('btnIrLupa');
@@ -534,12 +534,16 @@ input, select, textarea {
             if(c4.value === 'aa') { c4.className = 'select-alelo correto'; corretos++; } else { c4.className = 'select-alelo errado'; }
 
             msg.classList.remove('escondido');
+            
+            // 👇 GATILHOS DE ACERTO E ERRO DO MENDEL AQUI 👇
             if(corretos === 4) {
                 msg.innerHTML = "<span style='color: #20B2AA;'>Excelente! A probabilidade do bebê (aa) é de 25%.</span>";
                 btnLupa.classList.remove('escondido');
+                registrarConclusaoSilenciosa("Mendel: Desafio do Albinismo", "Acertou ✅");
             } else {
                 msg.innerHTML = "<span style='color: #E74C3C;'>Ainda há erros no quadro. Corrija as células em vermelho!</span>";
                 btnLupa.classList.add('escondido');
+                registrarConclusaoSilenciosa("Mendel: Desafio do Albinismo", "Errou ❌");
             }
         }
 
