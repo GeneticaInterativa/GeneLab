@@ -611,7 +611,7 @@ input, select, textarea {
                 
                 // GATILHO INVISÍVEL
                 if (typeof registrarConclusaoSilenciosa === "function") {
-                    registrarConclusaoSilenciosa("Central de Diagnóstico");
+                    registrarConclusaoSilenciosa("Diagnóstico: " + casoAtual.paciente + " (" + casoAtual.doenca + ")");
                 }
             } else {
                 feedback.innerHTML = `<strong>❌ Erro de Classificação no Laudo.</strong><br><br>Repense os conceitos. Avalie cautelosamente a sintomatologia associada aos gêneros masculino/feminino ou se o traço pula gerações nas notas ambulatoriais e nos exames da base de dados acima de seu rascunho de Punnett.`;
