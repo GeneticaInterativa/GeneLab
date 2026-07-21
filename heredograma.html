@@ -541,16 +541,18 @@ input, select, textarea {
             const opcaoCorreta = caso.opcoes.find(op => op.correta);
 
             if (letraEscolhida === opcaoCorreta.letra) {
-                fb.innerHTML = `✅ <b>Resposta Correta!</b>...`;
+                fb.innerHTML = `✅ <b>Resposta Correta!</b><br><br>${caso.explicacao}`;
                 fb.className = 'mensagem-feedback feedback-sucesso';
                 
                 registrarConclusaoSilenciosa("Heredograma: " + caso.nome + " (Interpretação)", "Acertou ✅");
             } else {
-                fb.innerHTML = `❌ <b>Resposta Incorreta.</b>...`;
+                fb.innerHTML = `❌ <b>Resposta Incorreta.</b> A alternativa correta é a <b>(${opcaoCorreta.letra.toUpperCase()})</b>.<br><br>${caso.explicacao}`;
                 fb.className = 'mensagem-feedback feedback-erro';
                 
                 registrarConclusaoSilenciosa("Heredograma: " + caso.nome + " (Interpretação)", "Errou ❌");
             }
+            fb.style.display = 'block';
+        }
 
         function casoAleatorio() {
             const ids = Object.keys(casos);
@@ -621,7 +623,7 @@ input, select, textarea {
 
             const fb = document.getElementById('mensagem-feedback');
 
-      if (erroBiologicoX) {
+            if (erroBiologicoX) {
                 fb.innerHTML = `<b>ERRO CONCEITUAL:</b> Você marcou <b>${nomeErroBiologico}</b> como "Portador". Homens (XY) não podem esconder doenças ligadas ao X. Ou são Afetados, ou Saudáveis.`;
                 fb.className = 'mensagem-feedback feedback-erro';
                 registrarConclusaoSilenciosa("Heredograma: " + casos[casoAtual].nome + " (Montagem)", "Errou ❌");
