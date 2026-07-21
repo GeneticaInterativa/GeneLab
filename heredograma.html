@@ -546,7 +546,7 @@ input, select, textarea {
                 
                 // ---> SALVANDO O PROGRESSO INVISÍVEL <---
                 if (typeof registrarConclusaoSilenciosa === "function") {
-                    registrarConclusaoSilenciosa("Heredograma (Interpretação)");
+                   registrarConclusaoSilenciosa("Heredograma: " + caso.nome + " (Interpretação)");
                 }
             } else {
                 fb.innerHTML = `❌ <b>Resposta Incorreta.</b> A alternativa correta é a <b>(${opcaoCorreta.letra.toUpperCase()})</b>.<br><br>${caso.explicacao}`;
@@ -639,7 +639,7 @@ input, select, textarea {
                 
                 // ---> SALVANDO O PROGRESSO INVISÍVEL <---
                 if (typeof registrarConclusaoSilenciosa === "function") {
-                    registrarConclusaoSilenciosa("Heredograma (Montagem)");
+                   registrarConclusaoSilenciosa("Heredograma: " + casos[casoAtual].nome + " (Montagem)");
                 }
             } else {
                 fb.innerHTML = `❌ <b>Incorreto.</b> Releia o prontuário. Verifique se os portadores fazem sentido anatômico para passar o gene adiante.`;
