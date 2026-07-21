@@ -606,16 +606,18 @@ input, select, textarea {
             }
 
             if (heranca === casoAtual.respostaHeranca && prob === casoAtual.respostaProbabilidade) {
-                feedback.innerHTML = `<strong>✅ Relatório Aprovado (Laudo Perfeito)</strong><br><br>${casoAtual.explicacao}`;
+                feedback.innerHTML = `<strong>✅ Relatório Aprovado...`;
                 feedback.className = 'feedback-box sucesso fade-in';
                 
-                // GATILHO INVISÍVEL
-                if (typeof registrarConclusaoSilenciosa === "function") {
-                    registrarConclusaoSilenciosa("Diagnóstico: " + casoAtual.paciente + " (" + casoAtual.doenca + ")");
-                }
+                // GATILHO DE ACERTO
+                registrarConclusaoSilenciosa("Diagnóstico: " + casoAtual.paciente + " (" + casoAtual.doenca + ")", "Acertou ✅");
+
             } else {
-                feedback.innerHTML = `<strong>❌ Erro de Classificação no Laudo.</strong><br><br>Repense os conceitos. Avalie cautelosamente a sintomatologia associada aos gêneros masculino/feminino ou se o traço pula gerações nas notas ambulatoriais e nos exames da base de dados acima de seu rascunho de Punnett.`;
+                feedback.innerHTML = `<strong>❌ Erro de Classificação...`;
                 feedback.className = 'feedback-box erro fade-in';
+                
+                // GATILHO DE ERRO
+                registrarConclusaoSilenciosa("Diagnóstico: " + casoAtual.paciente + " (" + casoAtual.doenca + ")", "Errou ❌");
             }
             
             feedback.classList.remove('escondido');
