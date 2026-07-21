@@ -571,22 +571,25 @@ input, select, textarea {
         }
     </script>
 
-    <!-- RASTREADOR INVISÍVEL - MODO AVANÇADO -->
+    <!-- RASTREADOR INVISÍVEL COM STATUS DE ACERTO/ERRO -->
     <script>
-        function registrarConclusaoSilenciosa(nomeDaAtividade) {
+        function registrarConclusaoSilenciosa(nomeDaAtividade, statusDaTentativa) {
             const nome = localStorage.getItem('genelab_nome') || 'Aluno Desconhecido';
             const matricula = localStorage.getItem('genelab_matricula') || 'Sem Matrícula';
 
-            // TRAVA envia dados TODAS as vezes que o aluno concluir a atividade!
-
-            const urlDaPlanilha = "https://script.google.com/macros/s/AKfycbxkAHZIgcJPbTUXMIJkGE4CBhSh0C5pl_7IgvTIWoc2idZxJmcdqPTFnkRxxoWXwdY/exec";
+            const urlDaPlanilha = "https://script.google.com/macros/s/AKfycbxStMWXUNEYWxU-_3FgvSKBGqQ8suRUDjAqkGJtNngI1NZ0d-X7_Dzjyq7zmwWQMTOy/exec";
 
             fetch(urlDaPlanilha, {
                 method: 'POST',
-                body: JSON.stringify({ nome: nome, matricula: matricula, modulo: nomeDaAtividade }),
+                body: JSON.stringify({ 
+                    nome: nome, 
+                    matricula: matricula, 
+                    modulo: nomeDaAtividade,
+                    status: statusDaTentativa // Captura se foi Acerto ou Erro
+                }),
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
             }).then(response => {
-                console.log("Sucesso: " + nomeDaAtividade + " registrado.");
+                console.log("Rastreado: " + nomeDaAtividade + " | " + statusDaTentativa);
             }).catch(error => {
                 console.error("Erro no rastreador:", error);
             });
