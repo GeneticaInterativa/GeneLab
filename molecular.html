@@ -1261,17 +1261,21 @@
                 if (!gelRodou || !preparoRealizado) { feedback.style.background = '#F8D7DA'; feedback.style.color = '#721C24'; feedback.innerHTML = "<b>Aviso de Conduta:</b> Conclua todas as fases do protocolo analítico antes de consolidar o laudo."; return; }
                 if (diagP1 === "0" || diagP2 === "0") { feedback.style.background = '#FFF3CD'; feedback.style.color = '#856404'; feedback.innerText = "É mandatório declarar o parecer conclusivo final para todos os indivíduos genotipados."; return; }
 
-                if (diagP1 === casoAtual.laudo_p1 && diagP2 === casoAtual.laudo_p2) {
+              if (diagP1 === casoAtual.laudo_p1 && diagP2 === casoAtual.laudo_p2) {
                     feedback.style.background = '#D4EDDA'; feedback.style.color = '#155724'; feedback.innerHTML = `<h3 style="margin-top:0;">Fase Laboratorial Concluída e Aprovada</h3>${casoAtual.feedback_laudo}`;
                     
-                    // GATILHO INVISÍVEL
+                    // GATILHO INVISÍVEL DE ACERTO
                     if (typeof registrarConclusaoSilenciosa === "function") {
-                        registrarConclusaoSilenciosa("Molecular: " + casoAtual.id + " (" + casoAtual.doenca + ")");
+                        registrarConclusaoSilenciosa("Molecular: " + casoAtual.id + " (" + casoAtual.doenca + ")", "Acertou ✅");
                     }
                 } else {
                     feedback.style.background = '#F8D7DA'; feedback.style.color = '#721C24'; feedback.innerHTML = "<b>Laudo Técnico Incorreto.</b> Reavalie cautelosamente a eletroforese comparando as bandas de cada familiar com os controles.";
+                    
+                    // GATILHO INVISÍVEL DE ERRO
+                    if (typeof registrarConclusaoSilenciosa === "function") {
+                        registrarConclusaoSilenciosa("Molecular: " + casoAtual.id + " (" + casoAtual.doenca + ")", "Errou ❌");
+                    }
                 }
-            });
         });
     </script>
 
