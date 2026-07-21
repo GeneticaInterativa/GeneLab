@@ -650,29 +650,22 @@ input, select, textarea {
         }
     </script>
     
-    <!-- RASTREADOR INVISÍVEL PARA O RELATÓRIO DA MONITORIA -->
+    <!-- RASTREADOR INVISÍVEL - MODO AVANÇADO -->
     <script>
-        function registrarConclusaoSilenciosa(nomeDoModulo) {
+        function registrarConclusaoSilenciosa(nomeDaAtividade) {
             const nome = localStorage.getItem('genelab_nome') || 'Aluno Desconhecido';
             const matricula = localStorage.getItem('genelab_matricula') || 'Sem Matrícula';
 
-            // Cria uma trava silenciosa no navegador para não preencher a planilha 10x se o aluno clicar várias vezes
-            const chaveTrava = 'genelab_enviado_' + nomeDoModulo;
-            if (localStorage.getItem(chaveTrava) === 'true') {
-                return; // Se já mandou, não faz nada
-            }
+            // TRAVA envia dados TODAS as vezes que o aluno concluir a atividade!
 
-            // COLOQUE O SEU LINK DO GOOGLE APPS SCRIPT AQUI DENTRO DAS ASPAS:
-            const urlDaPlanilha = "https://script.google.com/macros/s/AKfycbxkAHZIGcJpbTUXMIJkGE4CBhSh0C5pl_7IgvTIWoc2idZxJmcdqPTFnkRxxoWXwdY/exec";
+            const urlDaPlanilha = "https://script.google.com/macros/s/AKfycbxkAHZIgcJPbTUXMIJkGE4CBhSh0C5pl_7IgvTIWoc2idZxJmcdqPTFnkRxxoWXwdY/exec";
 
             fetch(urlDaPlanilha, {
                 method: 'POST',
-                body: JSON.stringify({ nome: nome, matricula: matricula, modulo: nomeDoModulo }),
-                // Usar text/plain evita bloqueios de segurança (CORS) do navegador
+                body: JSON.stringify({ nome: nome, matricula: matricula, modulo: nomeDaAtividade }),
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
             }).then(response => {
-                // Sucesso! O dado caiu na planilha. Trava o envio para este módulo.
-                localStorage.setItem(chaveTrava, 'true');
+                console.log("Sucesso: " + nomeDaAtividade + " registrado.");
             }).catch(error => {
                 console.error("Erro no rastreador:", error);
             });
