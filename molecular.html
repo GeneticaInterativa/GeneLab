@@ -949,7 +949,6 @@
                 ultimaBaseMutada = index; 
             } else if (modo === 'del') {
                 dnaSequencia.splice(index, 1);
-                // O efeito da deleção: A letra "nova" que assumiu a posição index vai piscar para indicar o frameshift
                 ultimaBaseMutada = dnaSequencia.length > 0 ? Math.min(index, dnaSequencia.length - 1) : -1; 
             }
             
@@ -1069,7 +1068,6 @@
         ];
         let cubaAtualObj = null;
 
-        // Banco de Casos Reduzido para 2 Pacientes (Foco e melhor responsividade)
         const bancoDeCasos = [
             { 
                 id: "#CF-1044", especialidade: "Pneumogenética", doenca: "Fibrose Cística", titulo_fam: "Investigação Genética", 
@@ -1277,7 +1275,7 @@
                     }
                 }
             });
-        }); //
+        });
     </script>
 
    <!-- RASTREADOR INVISÍVEL COM STATUS DE ACERTO/ERRO -->
@@ -1305,4 +1303,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
