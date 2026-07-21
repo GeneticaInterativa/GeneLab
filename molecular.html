@@ -1266,7 +1266,7 @@
                     
                     // GATILHO INVISÍVEL
                     if (typeof registrarConclusaoSilenciosa === "function") {
-                        registrarConclusaoSilenciosa("Mundo Molecular");
+                        registrarConclusaoSilenciosa("Molecular: " + casoAtual.id + " (" + casoAtual.doenca + ")");
                     }
                 } else {
                     feedback.style.background = '#F8D7DA'; feedback.style.color = '#721C24'; feedback.innerHTML = "<b>Laudo Técnico Incorreto.</b> Reavalie cautelosamente a eletroforese comparando as bandas de cada familiar com os controles.";
