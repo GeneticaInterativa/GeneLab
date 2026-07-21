@@ -541,19 +541,16 @@ input, select, textarea {
             const opcaoCorreta = caso.opcoes.find(op => op.correta);
 
             if (letraEscolhida === opcaoCorreta.letra) {
-                fb.innerHTML = `✅ <b>Resposta Correta!</b><br><br>${caso.explicacao}`;
+                fb.innerHTML = `✅ <b>Resposta Correta!</b>...`;
                 fb.className = 'mensagem-feedback feedback-sucesso';
                 
-                // ---> SALVANDO O PROGRESSO INVISÍVEL <---
-                if (typeof registrarConclusaoSilenciosa === "function") {
-                   registrarConclusaoSilenciosa("Heredograma: " + caso.nome + " (Interpretação)");
-                }
+                registrarConclusaoSilenciosa("Heredograma: " + caso.nome + " (Interpretação)", "Acertou ✅");
             } else {
-                fb.innerHTML = `❌ <b>Resposta Incorreta.</b> A alternativa correta é a <b>(${opcaoCorreta.letra.toUpperCase()})</b>.<br><br>${caso.explicacao}`;
+                fb.innerHTML = `❌ <b>Resposta Incorreta.</b>...`;
                 fb.className = 'mensagem-feedback feedback-erro';
+                
+                registrarConclusaoSilenciosa("Heredograma: " + caso.nome + " (Interpretação)", "Errou ❌");
             }
-            fb.style.display = 'block';
-        }
 
         function casoAleatorio() {
             const ids = Object.keys(casos);
